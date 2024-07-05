@@ -1,0 +1,203 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@10.5.2/lib/browser/math.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Virtual Labs</title>
+    <style>
+      table {
+        width: 80%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- sidebar and body -->
+    <div class="flex min-h-[80vh]">
+      <div class="px-6 pb-6 mt-1 flex-1">
+        <div class="">
+          <div class="flex flex-col justify-center">
+            <div class="flex max-lg:flex-col gap-x-12 gap-y-2 mt-2">
+              <div class="">
+                <div class="flex items-center justify-center gap-1">
+                  <label for="numBits">Enter number of bits:</label>
+                  <input
+                    class="max-lg:ml-10 border border-black px-2 py-1 rounded-sm"
+                    type="number"
+                    id="numBits"  
+                    value="20"
+                  />
+                </div>
+              </div>
+              <div class="flex justify-center">
+                <button
+                  class="bg-blue-500 text-white rounded-md px-2 py-1"
+                  class="button"
+                  onclick="generateAndPlot()"
+                >
+                    Simulate
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2 justify-center max-lg:flex-col">
+              <div id="message-signal" class="w-[600px] max-h-[400px]"></div>
+              <div id="filtered-signal" class="w-[600px] max-h-[400px]"></div>
+          </div>
+          <div class="flex gap-2 justify-center max-lg:flex-col">
+            <div id="modulated-signal" class="w-[600px] max-h-[400px]"></div>
+            <div id="demodulated-signal" class="w-[600px] max-h-[400px]"></div>
+        </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Helper function to generate linearly spaced arrays
+    function linspace(start, end, num) {
+      const step = (end - start) / (num - 1);
+      return Array.from({ length: num }, (_, i) => start + (i * step));
+    }
+    
+    // Custom convolution function
+    function convolve(arr1, arr2) {
+      const result = Array(arr1.length + arr2.length - 1).fill(0);
+      arr1.forEach((a, i) => {
+        arr2.forEach((b, j) => {
+          result[i + j] += a * b;
+        });
+      });
+      return result;
+    }
+    
+    // Custom unwrap function
+    function unwrap(phase) {
+      const unwrapped = [...phase];
+      for (let i = 1; i < phase.length; i++) {
+        let delta = unwrapped[i] - unwrapped[i - 1];
+        if (delta > Math.PI) {
+          unwrapped[i] -= 2 * Math.PI;
+        } else if (delta < -Math.PI) {
+          unwrapped[i] += 2 * Math.PI;
+        }
+      }
+      return unwrapped;
+    }
+    
+    function generateAndPlot() {
+    // Initialize parameters
+    const samples = 36;
+    const Tb = 1; // bit duration
+    const SamplePeriod = Tb * (1 / samples);
+    
+    // Generate random message bits
+    const numBits = parseInt(document.getElementById('numBits').value);
+    const m = Array.from({ length: numBits }, () => Math.random() < 0.5 ? -1 : 1);
+    const t1 = Array.from({ length: Math.ceil(m.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
+    
+    // Convert message into a series of unipolar NRZ data.
+    const rect = m.flatMap(bit => Array(samples).fill(bit));
+    
+    // Plot the message signal as a binary signal
+    const t_rect = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
+    const rect_step = rect.flatMap((val) => [val, val]);
+    Plotly.newPlot('message-signal', [{ x: t_rect, y: rect_step, type: 'scatter', mode: 'lines' }],
+      { title: 'Message Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
+    
+    // Create Gaussian low pass filter
+    function GMSK_gaussian_filter1(T, sps) {
+      const t = linspace(-1.5 * T, 1.5 * T, Math.ceil(3 * T * sps));
+      const BT = 0.3; // T=1
+      const h = t.map(t => BT * Math.sqrt(2 * Math.PI / Math.log(2)) * Math.exp(-2 * (Math.PI ** 2) * (BT ** 2) * (t ** 2) / Math.log(2)));
+      const K = Math.PI / 2 / math.sum(h);
+      let gfilter = h.map(val => K * val);
+      gfilter = math.divide(gfilter, Math.sqrt(math.sum(gfilter.map(val => val * val))));
+      return gfilter;
+    }
+    
+    const gaussfilter = GMSK_gaussian_filter1(Tb, samples);
+    
+    // Pass message signal through Gaussian LPF
+    const m_filtered = convolve(rect, gaussfilter).concat(rect.slice(-1));
+    
+    // Plot the filtered signal
+    Plotly.newPlot('filtered-signal', [{ x: math.range(0, m_filtered.length).toArray(), y: m_filtered, type: 'scatter', mode: 'lines' }],
+      { title: 'Filtered Signal', xaxis: { title: 'Samples' }, yaxis: { title: 'Amplitude' } });
+    
+    // Integrate the filtered data
+    const m_filtered1 = math.cumsum(m_filtered);
+    
+    // Generate the GMSK modulated signal
+    const m_filtered2_real = m_filtered1.map(val => Math.cos(val));
+    const m_filtered2_imag = m_filtered1.map(val => Math.sin(val));
+    const m_filtered2 = m_filtered2_real.map((val, idx) => math.complex(val, m_filtered2_imag[idx]));
+    
+    // Plot the GMSK modulated signal
+    Plotly.newPlot('modulated-signal', [
+      { x: math.range(0, m_filtered2_real.length).toArray(), y: m_filtered2_real, type: 'scatter', mode: 'lines', name: 'In-phase' },
+      { x: math.range(0, m_filtered2_imag.length).toArray(), y: m_filtered2_imag, type: 'scatter', mode: 'lines', name: 'Quadrature' }
+    ], { title: 'GMSK Modulated Signal', xaxis: { title: 'Samples' }, yaxis: { title: 'Amplitude' } });
+    
+    // No noise is introduced here. The signal remains as is.
+    const noisy_real = m_filtered2_real;
+    const noisy_imag = m_filtered2_imag;
+    
+    // Pass I and Q through Matched Filter
+    function GMSK_matched_filter(T, sps) {
+      const t = linspace(-1.5 * T, 1.5 * T, Math.ceil(3 * T * sps));
+      const BT = 0.75;
+      const h = t.map(t => BT * Math.sqrt(2 * Math.PI / Math.log(2)) * Math.exp(-2 * (Math.PI ** 2) * (BT ** 2) * (t ** 2) / Math.log(2)));
+      const K = Math.PI / 2 / math.sum(h);
+      let Mfil = h.map(val => K * val);
+      Mfil = math.divide(Mfil, Math.sqrt(math.sum(Mfil.map(val => val * val))));
+      return Mfil;
+    }
+    
+    const mfilt_samples = 7;
+    const matchfilter = GMSK_matched_filter(Tb, mfilt_samples);
+    
+    // Convolve the filter with the signal and add an extra sample to the end.
+    const filt_noisy_real = convolve(noisy_real, matchfilter).concat(noisy_real.slice(-1));
+    const filt_noisy_imag = convolve(noisy_imag, matchfilter).concat(noisy_imag.slice(-1));
+    
+    // Obtain the phase of the analog signal
+    const phase = filt_noisy_real.map((val, idx) => Math.atan2(filt_noisy_imag[idx], val));
+    const unwrapped_phase = unwrap(phase);
+    
+    // Obtain the derivative of the signal.
+    const derivative = unwrapped_phase.map((val, idx) => idx === 0 ? val : val - unwrapped_phase[idx - 1]);
+    
+    // Downsample the signal
+    function GMSK_downsample(start, end, sps, derivative) {
+      return derivative.filter((_, idx) => idx >= start && idx < derivative.length - end && (idx - start) % sps === 0);
+    }
+    
+    const rx_dwnsmpled = GMSK_downsample(70, 71, samples, derivative);
+    
+    // ADC Conversion
+    function GMSK_ADC(rx_down) {
+      return rx_down.map(val => val < 0 ? -1 : 1);
+    }
+    
+    const rx_digital = GMSK_ADC(rx_dwnsmpled);
+    
+    // Plot the demodulated signal as a binary signal
+    const t_rx_digital = rx_digital.flatMap((val, idx) => [idx, idx + 1]);
+    const rx_digital_step = rx_digital.flatMap((val) => [val, val]);
+    Plotly.newPlot('demodulated-signal', [{ x: t_rx_digital, y: rx_digital_step, type: 'scatter', mode: 'lines' }],
+      { title: 'Demodulated Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
+    }
+    </script>
+  </body>
+</html>
