@@ -1,1 +1,1 @@
-## Study of effect of channel on system with various modulation
+## Study of Modulation schemes with Memory, like MSK, GMSK etc.
