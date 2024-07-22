@@ -1,0 +1,240 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Virtual Labs</title>
+    <style>
+      table {
+        width: 80%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- sidebar and body -->
+    <div class="flex min-h-[80vh]">
+      <div class="px-6 pb-6 mt-1 flex-1">
+        <div class="">
+          <div class="flex flex-col justify-center">
+            <div class="flex max-lg:flex-col gap-x-12 gap-y-2 mt-2">
+              <div class="">
+                <div class="flex items-center justify-center gap-1">
+                  <label for="bitstreamInput">Enter Bitstream (0s and 1s separated by commas):</label>
+                  <input
+                    class="max-lg:ml-10 border border-black px-2 py-1 rounded-sm"
+                    type="text"
+                    id="bitstreamInput"  
+                    value="0, 1, 0, 0, 1, 1"
+                  />
+                </div>
+              </div>
+              <div class="flex justify-center">
+                <button
+                  class="bg-blue-500 text-white rounded-md px-2 py-1"
+                  class="button"
+                  onclick="updateBitstream()"
+                >
+                Update Bitstream
+                </button>
+              </div>
+            </div>
+            </div>
+            <div class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="bitstreamPlot" class="w-[600px] h-[450px]"></div>
+                <div id="mskModulatedPlot" class="w-[600px] h-[450px]"></div>
+              </div>
+              <div class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="demodulatedPlot" class="w-[600px] h-[450px]"></div>
+            </div>
+        </div>
+      </div>
+    </div>
+    <script>
+        function modulateMSK(bitstream, fc, baud, Fs) {
+            // Convert bitstream to -1s and 1s
+            let Dk = bitstream.map(bit => 2 * bit - 1);
+            Dk.unshift(-1); // Add initial value for Dk
+
+            let N = bitstream.length;
+            let T = 1 / baud;
+            let t = [];
+            for (let i = 0; i < N * T * Fs; i++) {
+                t.push(i / Fs);
+            }
+
+            // Calculate Phase Constraint Vector, Xk
+            let Xk = [0];
+            for (let k = 1; k <= N; k++) {
+                Xk[k] = (Xk[k - 1] + ((Math.PI * k) / 2) * (Dk[k - 1] - Dk[k])) % (2 * Math.PI);
+            }
+            Xk.shift();
+
+            // Generate MSK Waveform
+            let s = [];
+            for (let i = 0; i < t.length; i++) {
+                let symbolIndex = Math.floor(t[i] / T);
+                let Dk_value = Dk[symbolIndex + 1];
+                let Xk_value = Xk[symbolIndex];
+                s.push(Math.cos(2 * Math.PI * (fc + Dk_value / (4 * T)) * t[i] + Xk_value));
+            }
+
+            return [s, t];
+        }
+
+        function demodMSK(s, fc, baud, Fs) {
+            let T = 1 / baud;
+            let samplesPerSymbol = T * Fs;
+            let N = s.length;
+            let s1 = modulateMSK([1], fc, baud, Fs)[0]; // Waveform of an MSK modulated 1 bit
+            let s0 = modulateMSK([0], fc, baud, Fs)[0]; // Waveform of an MSK modulated 0 bit
+            let bitstream = [];
+            for (let n = 0; n < N; n += samplesPerSymbol) {
+                if (n + samplesPerSymbol > N) {
+                    break;
+                }
+                let bit = 0;
+                let corr1 = xcorr(s.slice(n, n + samplesPerSymbol), s1); // correlate s1
+                let max1 = Math.max(...corr1);
+                let min1 = Math.min(...corr1);
+                let corr0 = xcorr(s.slice(n, n + samplesPerSymbol), s0); // correlate s0
+                let max0 = Math.max(...corr0);
+                let min0 = Math.min(...corr0);
+                if ((max1 + Math.abs(min1)) > (max0 + Math.abs(min0))) {
+                    bit = 1;
+                }
+                bitstream.push(bit);
+            }
+            return bitstream;
+        }
+
+        // Cross-correlation function (just for demonstration)
+        function xcorr(x, y) {
+            let result = [];
+            for (let delay = -x.length + 1; delay < y.length; delay++) {
+                let sum = 0;
+                for (let i = 0; i < x.length; i++) {
+                    if (i + delay >= 0 && i + delay < y.length) {
+                        sum += x[i] * y[i + delay];
+                    }
+                }
+                result.push(sum);
+            }
+            return result;
+        }
+
+        // Function to update bitstream and plot graphs
+        function updateBitstream() {
+            let bitstreamInput = document.getElementById("bitstreamInput").value;
+            let bitstreamArray = bitstreamInput.split(",").map(Number); // Convert comma-separated string to array of numbers
+            // Update bitstream and replot
+            let result = modulateAndDemodulate(bitstreamArray, 1, 1, 10000);
+            plotGraphs(result);
+        }
+
+        // Function to modulate and demodulate MSK
+        function modulateAndDemodulate(bitstream, fc, baud, Fs) {
+            // Modulate MSK
+            let modulatedResult = modulateMSK(bitstream, fc, baud, Fs);
+            let y = modulatedResult[0];
+            let t = modulatedResult[1];
+
+            // Demodulate MSK
+            let demodulatedBitstream = demodMSK(y, fc, baud, Fs);
+
+            return { bitstream: bitstream, modulatedSignal: y, demodulatedBitstream: demodulatedBitstream, time: t };
+        }
+
+        // Function to plot graphs
+        function plotGraphs(result) {
+            // Plot bitstream
+            let bitstreamTrace = {
+                x: result.time,
+                y: result.bitstream,
+                type: 'scatter',
+                mode: 'markers',
+                name: 'Bitstream',
+                marker: {
+                    size: 10
+                }
+            };
+
+            let bitstreamLayout = {
+                title: 'Input Bitstream',
+                xaxis: {
+                    title: 'Time (s)'
+                },
+                yaxis: {
+                    title: 'Bit Value'
+                }
+            };
+
+            let bitstreamData = [bitstreamTrace];
+            Plotly.newPlot('bitstreamPlot', bitstreamData, bitstreamLayout);
+
+            // Plot modulated MSK signal
+            let mskModulatedTrace = {
+                x: result.time,
+                y: result.modulatedSignal,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'MSK Modulated Signal'
+            };
+
+            let mskModulatedLayout = {
+                title: 'MSK Modulated Signal',
+                xaxis: {
+                    title: 'Time (s)'
+                },
+                yaxis: {
+                    title: 'Amplitude'
+                }
+            };
+
+            let mskModulatedData = [mskModulatedTrace];
+            Plotly.newPlot('mskModulatedPlot', mskModulatedData, mskModulatedLayout);
+
+            // Plot demodulated bitstream
+            let demodulatedBitstreamTrace = {
+                x: result.time.slice(0, result.demodulatedBitstream.length),
+                y: result.demodulatedBitstream,
+                type: 'scatter',
+                mode: 'markers',
+                name: 'Demodulated Bitstream',
+                marker: {
+                    size: 10
+                }
+            };
+
+            let demodulatedBitstreamLayout = {
+                title: 'Demodulated Bitstream',
+                xaxis: {
+                    title: 'Time (s)'
+                },
+                yaxis: {
+                    title: 'Bit Value'
+                }
+            };
+
+            let demodulatedBitstreamData = [demodulatedBitstreamTrace];
+            Plotly.newPlot('demodulatedPlot', demodulatedBitstreamData, demodulatedBitstreamLayout);
+        }
+
+        // Initial bitstream
+        let initialBitstream = [0, 1, 0, 0, 1, 1];
+        let initialResult = modulateAndDemodulate(initialBitstream, 1, 1, 10000);
+        plotGraphs(initialResult);
+    </script>
+  </body>
+</html>
