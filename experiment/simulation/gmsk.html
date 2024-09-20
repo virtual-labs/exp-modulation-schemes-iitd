@@ -1,12 +1,27 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjs@10.5.2/lib/browser/math.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/mathjs@10.5.2/lib/browser/math.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <title>Virtual Labs</title>
     <style>
+	    .container {
+            display: flex;
+			    height: 100vh; /* Full viewport height */
+        width: 100vw; /* Full viewport width */
+        }
+		.left-half {
+            width: 50vw;
+			}
+
+        .right-half {
+            width: 50vw;
+		    position: relative;
+		    overflow: auto;
+        }
       table {
         width: 80%;
         border-collapse: collapse;
@@ -25,45 +40,272 @@
   </head>
   <body>
     <!-- sidebar and body -->
-    <div class="flex min-h-[80vh]">
+	    <!-- sidebar and body -->
+	<div id = "instructions">
+    <h1>Instructions for Gaussian Minimum Shift Keying Modulation (GMSK)</h1>
+    <ul>
+        <li>Step 1: Click on 'Generate Message' button to generate input message signal</li>
+		<li>Step 2: Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
+		<li>Step 3: Then click on 'Generate Filtered Signal' button to generate gaussian filtered signal</li>
+        <li>Step 4: Click on 'Generate Carrier' button to generate carrier signal</li>
+		<li>Step 5: You can change the number of bits, carrier signal frequency and time bandwidth product from the input fields</li>
+        <li>Step 6: Click on 'Generate GMSK Signal' button to generate Gaussian Minimum Shift Keying Signal</li>
+		<li>In GMSK, The filtered NRZ signal (which is now smoothed by the Gaussian filter)
+		is integrated over time to produce a phase signal. This is the key step that ensures 
+		continuous phase transitions, which is the hallmark of GMSK. <br/>&nbsp&nbsp&nbsp&nbsp&nbsp The integration ensures that the phase of the carrier changes
+		gradually, avoiding abrupt phase transitions and maintaining phase continuity.</li>
+    </ul>
+	</div>
+	<hr/>
+	<br>
+    <div class="flex min-h-[10vh]">
       <div class="px-6 pb-6 mt-1 flex-1">
         <div class="">
           <div class="flex flex-col justify-center">
             <div class="flex max-lg:flex-col gap-x-12 gap-y-2 mt-2">
               <div class="">
                 <div class="flex items-center justify-center gap-1">
-                  <label for="numBits">Enter number of bits:</label>
+                  <label for="numBits">Number of Bits:</label>
                   <input
                     class="max-lg:ml-10 border border-black px-2 py-1 rounded-sm"
                     type="number"
                     id="numBits"  
-                    value="20"
+                    value="10"
                   />
                 </div>
               </div>
-              <div class="flex justify-center">
-                <button
-                  class="bg-blue-500 text-white rounded-md px-2 py-1"
-                  class="button"
-                  onclick="generateAndPlot()"
-                >
-                    Simulate
-                </button>
+              <div class="flex items-center justify-center gap-1 mt-2">
+                <label for="carrierFrequencyInput">Carrier Frequency (Hz):</label>
+                <input
+                  class="border border-black px-2 py-1 rounded-sm"
+                  type="number"
+                  id="carrierFreq"
+                  value="100"
+                />
+              </div>
+			  <div class="flex items-center justify-center gap-1 mt-2">
+                <label for="timeBandwidth">Time-Bandwidth Product (BT):</label>
+                <input
+                  class="border border-black px-2 py-1 rounded-sm"
+                  type="number"
+                  id="timeBandwidth"
+                  value="0.3"
+                />
+              </div>
+              <div class="flex items-center justify-center gap-1 mt-2">
+                <label for="baudRateInput">Baud Rate (Hz):</label>
+                <input
+                  class="border border-black px-2 py-1 rounded-sm"
+                  type="number"
+                  id="baudRateInput"
+                  value="1" readonly
+                />
+              </div>
+
               </div>
             </div>
-          </div>
-          <div class="flex gap-2 justify-center max-lg:flex-col">
-              <div id="message-signal" class="w-[600px] max-h-[400px]"></div>
-              <div id="filtered-signal" class="w-[600px] max-h-[400px]"></div>
-          </div>
-          <div class="flex gap-2 justify-center max-lg:flex-col">
-            <div id="modulated-signal" class="w-[600px] max-h-[400px]"></div>
-            <div id="demodulated-signal" class="w-[600px] max-h-[400px]"></div>
-        </div>
+            </div>
         </div>
       </div>
     </div>
+	<hr/>
+	
+	<div class = "container">
+	<div class = "left-half">
+	          <div class="flex gap-1">
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full">
+				<br>
+                  <img
+                    src="gmsk_mod.png"
+                    alt="gmsk modulation" 
+					style= "height:300px; width: 650px; margin-left: 40px"
+                  />
+				<button
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute bottom-[450px] left-[2px]"
+                  onclick="plotMessageSignal()"
+                >
+                  Generate Message
+                </button>
+				<button
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute bottom-[400px] left-[2px]"
+                  onclick="generateAndPlot()"
+                >
+                  Generate NRZ Signal
+                </button>
+				<button
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute bottom-[200px] left-[2px]"
+                  onclick="plotFilteredSignal()"
+                >
+                  Generate Filtered<br/>Signal
+                </button>
+								<button
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute bottom-[150px] left-[2px]"
+                  onclick="generateCarrierSignal()"
+                >
+                  Generate Carrier
+                </button>
+				
+			    <button
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 relative bottom-[5px] left-[470px]"
+                  onclick="plotModulatedSignalReal()"
+                >
+                  Generate GMSK Signal
+                </button>
+				
+					                <button
+                  class="button bg-gray-500 text-white rounded-md px-2 py-1 relative top-[100px] right-[0px]"
+                  onclick="plotDemodulatedSignal()"
+                >
+                Perform Demodulation
+                </button>
+				
+              </div>
+              </div>
+			  </div>
+
+	</div>
+
+
+				
+	<div class = "right-half">
+	            <div id = "scrolltomessage" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="message-signal" class="w-[600px] h-[450px]"></div>
+			</div>
+				            <div id = "scrolltonrz" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="nrz-signal" class="w-[600px] h-[450px]"></div>
+			</div>
+		    <div id = "scrolltofilteredsignal" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="filtered-signal" class="w-[600px] h-[450px]"></div>
+			</div>
+			<div id = "scrolltocarrier" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="carrier-plot" class="w-[600px] h-[450px]"></div>
+			</div>
+			<div id = "scrolltomodulatedReal" class="flex items-center gap-2 justify-center max-lg:flex-col">
+                <div id="modulated-signalReal" class="w-[600px] h-[450px]"></div>
+              </div>
+			  			<div class="flex items-center gap-2 justify-center max-lg:flex-col">
+                <div id="modulated-signalImag" class="w-[600px] h-[450px]"></div>
+              </div>
+	</div>
+	</div>
+	
+	
+	
+
+	    <!-- sidebar and body -->
+			  <div id = "container">
+    <h1>Instructions for Gaussian Minimum Shift Keying (GMSK) Demodulation</h1>
+    <ul>
+		<li>Step 1: You can Demodulate the GMSK Signal clicking on the 'Demodulate GMSK' button</li>
+		<li>In GMSK demodulation, the low-pass filter (LPF) removes high-frequency noise, isolating the baseband signal. The phase estimator extracts the signal's phase, which carries the encoded data. The deviator converts phase changes into 
+		<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp frequency deviations to retrieve the transmitted data, and the decision circuit interprets these deviations, converting them into binary data (0s and 1s) based on set thresholds.</li>
+    </ul>
+</div>
+    <div class="flex min-h-[80vh]">
+      <div class="px-6 pb-6 flex-1">
+        <!--  -->
+        <div class="flex">
+          <div class="flex-1 basis-4/5 flex flex-col">
+            <div class="flex max-lg:flex-col mt-5 items-center gap-x-8 gap-y-2">
+
+
+            </div>
+            <div class="flex max-lg:flex-col mt-5 items-center gap-x-8 gap-y-2">
+ 
+
+            </div>
+          </div>
+
+        </div>
+        <div class="mt-4 border-t-2">
+          <div class="flex flex-col">
+            <div class="flex justify-center pt-4">
+              <button
+                class="bg-blue-500 text-white rounded-md px-2 py-1"
+                class="button"
+                onclick="plotDemodulatedSignal()"
+              >
+                Demodulate GMSK
+              </button>
+            </div>
+            <div class="flex gap-1">
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full">
+                  <img
+                    class="w-[80%] h-[80%]"
+                    src="gmsk_demod.png"
+                    alt="gmsk demodulation"
+                  />
+                </div>
+              </div>
+              <div id = "scrolltodemodulated" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="demodulated-signal" class="w-[600px] h-[450px]"></div>
+            </div>
+            </div>
+          </div>
+        </div>
+        <!--  -->
+      </div>
+    </div>
+			<script>	
+		        function checkFrequencies() {
+            // Get values from input fields
+            let carrierFrequency = parseFloat(document.getElementById('carrierFreq').value);
+            let bit_rate = parseFloat(document.getElementById('baudRateInput').value);
+            console.log(carrierFrequency);
+			console.log(bit_rate);
+            // Check the frequencies
+            if (carrierFrequency <= bit_rate) {
+                alert("Carrier frequency should be much higher than Baud Rate.");
+            } else {
+                console.log("Carrier frequency should be much higher than Baud Rate.");
+            }
+        }
+
+        // Function to attach event listeners to all buttons
+        function attachEventListeners() {
+            let buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', checkFrequencies);
+            });
+        }
+		
+		        // Attach event listeners when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', attachEventListeners);
+		</script>
+		
     <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Function to check the BT value
+            function checkBT() {
+                const btValue = parseFloat(document.getElementById('timeBandwidth').value);
+                if (btValue < 0.3 || btValue > 0.5) {
+                    alert("Please enter a BT value between 0.3 and 0.5.");
+                }
+            }
+
+            // Add event listener to all buttons on the page
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', checkBT);
+            });
+        });
+    </script>
+		
+    <script>
+	let numBits = 10;
+	let Tb = 1;
+	let samples = 36;
+	let rect = [];
+	let m_filtered = [];
+	let m_filtered2_real = [];
+	let m_filtered2_imag = [];
+	let m = [];
+	let SamplePeriod = 0;
+	let BT = parseFloat(document.getElementById('timeBandwidth').value);
+	let baudRate = parseInt(document.getElementById('baudRateInput').value);
+	console.log(baudRate);
       // Helper function to generate linearly spaced arrays
     function linspace(start, end, num) {
       const step = (end - start) / (num - 1);
@@ -97,28 +339,51 @@
     
     function generateAndPlot() {
     // Initialize parameters
-    const samples = 36;
-    const Tb = 1; // bit duration
-    const SamplePeriod = Tb * (1 / samples);
+    Tb = 1; // bit duration
+    SamplePeriod = Tb * (1 / samples);
     
     // Generate random message bits
-    const numBits = parseInt(document.getElementById('numBits').value);
-    const m = Array.from({ length: numBits }, () => Math.random() < 0.5 ? -1 : 1);
+    numBits = parseInt(document.getElementById('numBits').value);
+    mm = m.map(value => value * 2 - 1);
+    const t1 = Array.from({ length: Math.ceil(mm.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
+    
+    // Convert message into a series of unipolar NRZ data.
+    rect = mm.flatMap(bit => Array(samples).fill(bit));
+    
+    // Plot the message signal as a binary signal
+    const t_rect = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
+    const rect_step = rect.flatMap((val) => [val, val]);
+    Plotly.newPlot('nrz-signal', [{ x: t_rect, y: rect_step, type: 'scatter', mode: 'lines' }],
+      { title: 'NRZ Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
+    			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltonrz').scrollIntoView({ behavior: 'smooth' });
+	}
+	
+	function plotMessageSignal() {
+	    // Initialize parameters
+    Tb = 1; // bit duration
+    SamplePeriod = Tb * (1 / samples);
+    
+    // Generate random message bits
+    numBits = parseInt(document.getElementById('numBits').value);
+    m = Array.from({ length: numBits }, () => Math.random() < 0.5 ? 0 : 1);
     const t1 = Array.from({ length: Math.ceil(m.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
     
     // Convert message into a series of unipolar NRZ data.
-    const rect = m.flatMap(bit => Array(samples).fill(bit));
+    rect = m.flatMap(bit => Array(samples).fill(bit));
     
     // Plot the message signal as a binary signal
     const t_rect = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
     const rect_step = rect.flatMap((val) => [val, val]);
     Plotly.newPlot('message-signal', [{ x: t_rect, y: rect_step, type: 'scatter', mode: 'lines' }],
       { title: 'Message Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
-    
+    			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltomessage').scrollIntoView({ behavior: 'smooth' });
+	}
+	
     // Create Gaussian low pass filter
     function GMSK_gaussian_filter1(T, sps) {
       const t = linspace(-1.5 * T, 1.5 * T, Math.ceil(3 * T * sps));
-      const BT = 0.3; // T=1
       const h = t.map(t => BT * Math.sqrt(2 * Math.PI / Math.log(2)) * Math.exp(-2 * (Math.PI ** 2) * (BT ** 2) * (t ** 2) / Math.log(2)));
       const K = Math.PI / 2 / math.sum(h);
       let gfilter = h.map(val => K * val);
@@ -126,29 +391,90 @@
       return gfilter;
     }
     
+	function plotFilteredSignal() {
     const gaussfilter = GMSK_gaussian_filter1(Tb, samples);
     
     // Pass message signal through Gaussian LPF
-    const m_filtered = convolve(rect, gaussfilter).concat(rect.slice(-1));
+    m_filtered = convolve(rect, gaussfilter).concat(rect.slice(-1));
     
-    // Plot the filtered signal
-    Plotly.newPlot('filtered-signal', [{ x: math.range(0, m_filtered.length).toArray(), y: m_filtered, type: 'scatter', mode: 'lines' }],
-      { title: 'Filtered Signal', xaxis: { title: 'Samples' }, yaxis: { title: 'Amplitude' } });
-    
+// Plot the filtered signal
+Plotly.newPlot('filtered-signal', [{
+    x: math.range(0, m_filtered.length).toArray().map(i => i / samples), 
+    y: m_filtered, 
+    type: 'scatter', 
+    mode: 'lines'
+  }], 
+  { 
+    title: 'Filtered Signal', 
+    xaxis: { title: 'Time (Seconds)' }, // Updated label for clarity
+    yaxis: { title: 'Amplitude' }
+  }
+);
+			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltofilteredsignal').scrollIntoView({ behavior: 'smooth' });
+}
+
+function plotModulatedSignalReal() {
+    // Initialize parameters
+    const carrierFreq = parseInt(document.getElementById('carrierFreq').value);
+
+
     // Integrate the filtered data
     const m_filtered1 = math.cumsum(m_filtered);
-    
+
     // Generate the GMSK modulated signal
-    const m_filtered2_real = m_filtered1.map(val => Math.cos(val));
-    const m_filtered2_imag = m_filtered1.map(val => Math.sin(val));
+    m_filtered2_real = m_filtered1.map(val => Math.cos(val));
+    m_filtered2_imag = m_filtered1.map(val => Math.sin(val));
     const m_filtered2 = m_filtered2_real.map((val, idx) => math.complex(val, m_filtered2_imag[idx]));
-    
-    // Plot the GMSK modulated signal
-    Plotly.newPlot('modulated-signal', [
-      { x: math.range(0, m_filtered2_real.length).toArray(), y: m_filtered2_real, type: 'scatter', mode: 'lines', name: 'In-phase' },
-      { x: math.range(0, m_filtered2_imag.length).toArray(), y: m_filtered2_imag, type: 'scatter', mode: 'lines', name: 'Quadrature' }
-    ], { title: 'GMSK Modulated Signal', xaxis: { title: 'Samples' }, yaxis: { title: 'Amplitude' } });
-    
+
+    // Generate carrier signal
+    const t1 = Array.from({ length: Math.ceil(m_filtered1.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
+    const carrier_cos = t1.map((t) => Math.cos(2 * Math.PI * carrierFreq * t));
+    const carrier_sin = t1.map((t) => Math.sin(2 * Math.PI * carrierFreq * t));
+
+    // Generate the GMSK modulated signal with carrier
+    const m_filtered3_real = m_filtered1.map((val, idx) => Math.cos(val) * carrier_cos[idx]);
+    const m_filtered3_imag = m_filtered1.map((val, idx) => Math.sin(val) * carrier_sin[idx]);
+
+    // Plot the GMSK modulated signal (Real Part)
+    Plotly.newPlot('modulated-signalReal', [
+        { 
+            x: Array.from({ length: m_filtered3_real.length }, (_, i) => i * SamplePeriod), // Time vector
+            y: m_filtered3_real, 
+            type: 'scatter', 
+            mode: 'lines', 
+            name: 'In-phase' 
+        }
+    ], 
+    { 
+        title: 'GMSK Modulated Signal (Real Part)', 
+        xaxis: { title: 'Time (Seconds)' }, 
+        yaxis: { title: 'Amplitude' } 
+    });
+
+    // Plot the GMSK modulated signal (Imaginary Part)
+    Plotly.newPlot('modulated-signalImag', [
+        { 
+            x: Array.from({ length: m_filtered3_imag.length }, (_, i) => i * SamplePeriod), // Time vector
+            y: m_filtered3_imag, 
+            type: 'scatter', 
+            mode: 'lines',
+            line: { color: 'orange' }, // Change line color to blue			
+            name: 'Quadrature' 
+        }
+    ], 
+    { 
+        title: 'GMSK Modulated Signal (Imaginary Part)', 
+        xaxis: { title: 'Time (Seconds)' }, 
+        yaxis: { title: 'Amplitude' } 
+    });
+
+    // Scroll to the modulated signal view (optional)
+    document.getElementById('scrolltomodulatedReal').scrollIntoView({ behavior: 'smooth' });
+}
+
+
+    function plotDemodulatedSignal() {
     // No noise is introduced here. The signal remains as is.
     const noisy_real = m_filtered2_real;
     const noisy_imag = m_filtered2_imag;
@@ -156,7 +482,6 @@
     // Pass I and Q through Matched Filter
     function GMSK_matched_filter(T, sps) {
       const t = linspace(-1.5 * T, 1.5 * T, Math.ceil(3 * T * sps));
-      const BT = 0.75;
       const h = t.map(t => BT * Math.sqrt(2 * Math.PI / Math.log(2)) * Math.exp(-2 * (Math.PI ** 2) * (BT ** 2) * (t ** 2) / Math.log(2)));
       const K = Math.PI / 2 / math.sum(h);
       let Mfil = h.map(val => K * val);
@@ -187,7 +512,7 @@
     
     // ADC Conversion
     function GMSK_ADC(rx_down) {
-      return rx_down.map(val => val < 0 ? -1 : 1);
+      return rx_down.map(val => val < 0 ? 0 : 1);
     }
     
     const rx_digital = GMSK_ADC(rx_dwnsmpled);
@@ -197,7 +522,62 @@
     const rx_digital_step = rx_digital.flatMap((val) => [val, val]);
     Plotly.newPlot('demodulated-signal', [{ x: t_rx_digital, y: rx_digital_step, type: 'scatter', mode: 'lines' }],
       { title: 'Demodulated Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
-    }
-    </script>
+    			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltodemodulated').scrollIntoView({ behavior: 'smooth' });
+	}
+	
+			function generateCarrierSignal() {
+            Fs = parseInt(document.getElementById("carrierFreq").value)*10;
+            fc = parseInt(document.getElementById("carrierFreq").value);
+            const t = Array.from({ length: 1 * Fs }, (_, i) => i / Fs);
+            const carrier_signal = t.map((time) => Math.sin(2 * Math.PI * fc * time));
+
+            const carrierData = [{
+                x: t,
+                y: carrier_signal,
+                type: "scatter",
+                mode: "lines",
+                name: "Carrier Signal",
+            }];
+
+            const carrierLayout = {
+                title: "Carrier Signal",
+                xaxis: { title: "Time (Seconds)" },
+                yaxis: { title: "Amplitude" },
+            };
+
+            Plotly.newPlot("carrier-plot", carrierData, carrierLayout);
+						// Scroll to the plot area
+
+			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltocarrier').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>	
+	<style>
+	h1 {
+    color: #333;
+    font-size: 22px; /* Increased font size */
+    margin-bottom: 20px;
+}
+	ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #e0e7ff;
+    margin: 5px 0;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 14px; /* Set font size for list items */
+}
+
+li::before {
+    content: "✔";
+    color: #4caf50;
+    margin-right: 10px;
+}
+	</style>
   </body>
 </html>
