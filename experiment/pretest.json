@@ -2,38 +2,174 @@
   "version": 2.0,
   "questions": [
     {
-      "question": "This is a Sample Question 1?",
+      "question": "What does MSK stand for in digital communication?",
       "answers": {
-        "a": "answer1",
-        "b": "answer2",
-        "c": "answer3",
-        "d": "answer4"
+        "a": "Minimum Shift Keying",
+        "b": "Maximum Shift Keying",
+        "c": "Modulated Shift Keying",
+        "d": "Multi-State Keying"
       },
       "explanations": {
-        "a": "Explanation 1  <a href='www.google.com'>here</a>",
-        "b": "Explanation 2",
-        "c": "Explanation 2",
-        "d": "Explanation 2"
+        "a": "Correct! MSK stands for Minimum Shift Keying, a type of frequency modulation.",
+        "b": "Incorrect. Maximum Shift Keying is not a recognized term in modulation.",
+        "c": "Incorrect. Modulated Shift Keying is not a correct terminology.",
+        "d": "Incorrect. Multi-State Keying is not specific to MSK."
       },
       "correctAnswer": "a",
-      "difficulty": "beginner"
+      "difficulty": "intermediate"
     },
     {
-      "question": "This is a Sample Question 2?",
+      "question": "Which of the following is a key characteristic of GMSK?",
       "answers": {
-        "a": "answer1",
-        "b": "answer2",
-        "c": "answer3",
-        "d": "answer4"
+        "a": "It uses a Gaussian filter to smooth the signal.",
+        "b": "It requires more bandwidth than MSK.",
+        "c": "It operates without any filtering.",
+        "d": "It is a type of amplitude modulation."
       },
       "explanations": {
-        "a": "Explanation 1  <a href='www.google.com'>here</a>",
-        "b": "Explanation 2",
-        "c": "Explanation 2",
-        "d": "Explanation 2"
+        "a": "Correct! GMSK uses a Gaussian filter to minimize spectral spreading.",
+        "b": "Incorrect. GMSK actually requires less bandwidth compared to MSK.",
+        "c": "Incorrect. GMSK cannot operate without filtering.",
+        "d": "Incorrect. GMSK is a type of frequency modulation, not amplitude modulation."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "What advantage does GMSK have over MSK?",
+      "answers": {
+        "a": "Higher spectral efficiency",
+        "b": "Lower complexity",
+        "c": "No memory effect",
+        "d": "Higher bit error rate"
+      },
+      "explanations": {
+        "a": "Correct! GMSK provides higher spectral efficiency due to its filtering.",
+        "b": "Incorrect. GMSK can be more complex due to the Gaussian filter.",
+        "c": "Incorrect. GMSK has a memory effect due to the filtering.",
+        "d": "Incorrect. GMSK typically has a lower bit error rate."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "What type of modulation does MSK use?",
+      "answers": {
+        "a": "Phase Shift Keying",
+        "b": "Frequency Shift Keying",
+        "c": "Amplitude Shift Keying",
+        "d": "Quadrature Amplitude Modulation"
+      },
+      "explanations": {
+        "a": "Correct! MSK is a form of Phase Shift Keying.",
+        "b": "Incorrect. While MSK is related to frequency, it specifically modulates phase.",
+        "c": "Incorrect. MSK does not utilize amplitude modulation.",
+        "d": "Incorrect. MSK is not Quadrature Amplitude Modulation."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "In GMSK, the Gaussian filter helps to achieve which of the following?",
+      "answers": {
+        "a": "Reduced out-of-band emissions",
+        "b": "Increased bit rate",
+        "c": "Higher power consumption",
+        "d": "Wider bandwidth"
+      },
+      "explanations": {
+        "a": "Correct! The Gaussian filter reduces out-of-band emissions, improving spectral efficiency.",
+        "b": "Incorrect. The bit rate is not directly increased by the Gaussian filter.",
+        "c": "Incorrect. GMSK aims to minimize power consumption.",
+        "d": "Incorrect. GMSK typically achieves narrower bandwidth."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "Which of the following modulation schemes has the lowest bit error rate in noisy environments?",
+      "answers": {
+        "a": "MSK",
+        "b": "GMSK",
+        "c": "PSK",
+        "d": "ASK"
+      },
+      "explanations": {
+        "a": "Incorrect. MSK is effective in noisy environments but typically GMSK performs better.",
+        "b": "Correct! GMSK usually has a lower bit error rate than MSK in noisy conditions.",
+        "c": "Incorrect. PSK can also perform well, but GMSK is optimized for noise.",
+        "d": "Incorrect. ASK is more susceptible to noise and has a higher bit error rate."
+      },
+      "correctAnswer": "b",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "What is a primary application of GMSK modulation?",
+      "answers": {
+        "a": "Television broadcasting",
+        "b": "Satellite communication",
+        "c": "GSM cellular networks",
+        "d": "Wi-Fi networks"
+      },
+      "explanations": {
+        "a": "Incorrect. GMSK is not commonly used in television broadcasting.",
+        "b": "Incorrect. Satellite communication typically uses different modulation schemes.",
+        "c": "Correct! GMSK is widely used in GSM cellular networks for efficient data transmission.",
+        "d": "Incorrect. Wi-Fi networks usually use different modulation techniques."
       },
       "correctAnswer": "c",
-      "difficulty": "beginner"
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "How does MSK differ from conventional FSK?",
+      "answers": {
+        "a": "MSK uses a continuous phase.",
+        "b": "MSK has higher bandwidth requirements.",
+        "c": "MSK modulates amplitude.",
+        "d": "MSK is less power efficient."
+      },
+      "explanations": {
+        "a": "Correct! MSK utilizes continuous phase modulation, differentiating it from conventional FSK.",
+        "b": "Incorrect. MSK typically requires less bandwidth than conventional FSK.",
+        "c": "Incorrect. MSK does not modulate amplitude; it modulates phase.",
+        "d": "Incorrect. MSK is designed to be power efficient."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "What is the bandwidth efficiency of GMSK compared to traditional MSK?",
+      "answers": {
+        "a": "Higher bandwidth efficiency",
+        "b": "Lower bandwidth efficiency",
+        "c": "Equal bandwidth efficiency",
+        "d": "Dependent on modulation index"
+      },
+      "explanations": {
+        "a": "Correct! GMSK achieves higher bandwidth efficiency due to Gaussian filtering.",
+        "b": "Incorrect. GMSK has better bandwidth efficiency than traditional MSK.",
+        "c": "Incorrect. GMSK is more efficient than traditional MSK.",
+        "d": "Incorrect. While modulation index affects efficiency, GMSK is generally more efficient."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "What is the modulation index in MSK?",
+      "answers": {
+        "a": "1",
+        "b": "0.5",
+        "c": "2",
+        "d": "0"
+      },
+      "explanations": {
+        "a": "Correct! The modulation index for MSK is defined as 1.",
+        "b": "Incorrect. The modulation index for MSK is not 0.5.",
+        "c": "Incorrect. The modulation index for MSK is not 2.",
+        "d": "Incorrect. The modulation index cannot be 0 in MSK."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
     }
   ]
 }
