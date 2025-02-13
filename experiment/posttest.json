@@ -2,7 +2,7 @@
   "version": 2.0,
   "questions": [
     {
-      "question": "What is the key advantage of GMSK over MSK in terms of spectral efficiency?",
+      "question": "1. What is the key advantage of GMSK over MSK in terms of spectral efficiency?",
       "answers": {
         "a": "GMSK uses a Gaussian filter to limit bandwidth",
         "b": "GMSK has a lower modulation index",
@@ -19,7 +19,7 @@
       "difficulty": "hard"
     },
     {
-      "question": "What is the primary reason for using a Gaussian filter in GMSK?",
+      "question": "2. What is the primary reason for using a Gaussian filter in GMSK?",
       "answers": {
         "a": "To increase the transmission power",
         "b": "To reduce out-of-band emissions",
@@ -36,7 +36,7 @@
       "difficulty": "hard"
     },
     {
-      "question": "In terms of energy efficiency, how does GMSK compare to traditional MSK?",
+      "question": "3. In terms of energy efficiency, how does GMSK compare to traditional MSK?",
       "answers": {
         "a": "GMSK is less energy-efficient than MSK",
         "b": "GMSK is more energy-efficient than MSK",
@@ -53,7 +53,7 @@
       "difficulty": "hard"
     },
     {
-      "question": "What is the main drawback of MSK modulation?",
+      "question": "4. What is the main drawback of MSK modulation?",
       "answers": {
         "a": "Limited bandwidth efficiency",
         "b": "Complex receiver design",
@@ -70,7 +70,7 @@
       "difficulty": "hard"
     },
     {
-      "question": "How does the performance of GMSK degrade in the presence of non-linearities?",
+      "question": "5. How does the performance of GMSK degrade in the presence of non-linearities?",
       "answers": {
         "a": "It becomes more power-efficient",
         "b": "It experiences increased inter-symbol interference",
@@ -87,7 +87,7 @@
       "difficulty": "hard"
     },
     {
-      "question": "In which scenarios is MSK preferred over GMSK?",
+      "question": "6. In which scenarios is MSK preferred over GMSK?",
       "answers": {
         "a": "High-speed data transmission",
         "b": "When spectral efficiency is crucial",
@@ -104,7 +104,7 @@
       "difficulty": "hard"
     },
     {
-      "question": "What is the impact of memory effects in GMSK modulation?",
+      "question": "7. What is the impact of memory effects in GMSK modulation?",
       "answers": {
         "a": "Increases noise resilience",
         "b": "Enhances spectral efficiency",
@@ -121,7 +121,7 @@
       "difficulty": "hard"
     },
     {
-      "question": "Which parameter significantly affects the performance of MSK?",
+      "question": "8. Which parameter significantly affects the performance of MSK?",
       "answers": {
         "a": "Phase continuity",
         "b": "Gaussian filter bandwidth",
@@ -138,7 +138,7 @@
       "difficulty": "hard"
     },
     {
-      "question": "Which of the following describes the mathematical representation of MSK?",
+      "question": "9. Which of the following describes the mathematical representation of MSK?",
       "answers": {
         "a": "MSK uses rectangular pulses for modulation.",
         "b": "MSK modulation is represented by cosine and sine functions.",
@@ -155,7 +155,7 @@
       "difficulty": "hard"
     },
     {
-      "question": "In terms of implementation, which modulation scheme poses more challenges in terms of phase recovery?",
+      "question": "10. In terms of implementation, which modulation scheme poses more challenges in terms of phase recovery?",
       "answers": {
         "a": "MSK",
         "b": "GMSK",
@@ -167,23 +167,6 @@
         "b": "Correct! GMSK poses more challenges due to its Gaussian filtering and phase continuity.",
         "c": "Incorrect. GMSK is more complex in phase recovery than MSK.",
         "d": "Incorrect. Both modulation schemes have their unique challenges in implementation."
-      },
-      "correctAnswer": "b",
-      "difficulty": "hard"
-    },
-    {
-      "question": "Which modulation scheme is more robust to multipath fading?",
-      "answers": {
-        "a": "MSK",
-        "b": "GMSK",
-        "c": "Neither is robust",
-        "d": "Both are equally robust"
-      },
-      "explanations": {
-        "a": "Incorrect. MSK is less robust to multipath fading compared to GMSK.",
-        "b": "Correct! GMSK is more robust to multipath fading due to its continuous phase properties.",
-        "c": "Incorrect. GMSK has advantages over MSK in multipath fading environments.",
-        "d": "Incorrect. GMSK generally performs better in multipath conditions than MSK."
       },
       "correctAnswer": "b",
       "difficulty": "hard"
