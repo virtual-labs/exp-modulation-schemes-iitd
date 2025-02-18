@@ -25,12 +25,12 @@
             continuous phase frequency shift keyed (CPFSK) signal with a
             frequency separation of one half the bit rate. <br /><br />
           </p>
-          <p class="text-[24px] font-semibold text-black">
+          <h3 class="text-[24px] font-semibold text-black">
             Mathematical representation: <br />
-          </p>
+          </h3>
           <p>The resulting signal is represented by the formula</p>
           <div class="flex justify-center">
-            <img src="../images/theory/msk/msk1.png" alt="msk_image" />
+            <img src="./images/theory/msk/msk1.png" alt="msk_image" />
           </div>
           <p>
             <br />
@@ -41,7 +41,7 @@
             <br />
           </p>
           <div class="flex justify-center">
-            <img src="../images/theory/msk/msk2.png" alt="msk_image" />
+            <img src="./images/theory/msk/msk2.png" alt="msk_image" />
           </div>
           <p>
             <br />
@@ -52,11 +52,9 @@
             <br />
             <br />
           </p>
-
           <h3 class="text-[24px] font-semibold text-black py-2">
             Reason for Minimum Shift Keying, MSK <br />
           </h3>
-
           <p>
             It is found that binary data consisting of sharp transitions between
             "one" and "zero" states and vice versa potentially creates signals
