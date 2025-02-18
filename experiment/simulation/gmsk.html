@@ -258,6 +258,7 @@
             // Check the frequencies
             if (carrierFrequency <= bit_rate) {
                 alert("Carrier frequency should be much higher than Baud Rate.");
+		    window.location.reload(true); 
             } else {
                 console.log("Carrier frequency should be much higher than Baud Rate.");
             }
@@ -282,6 +283,7 @@
                 const btValue = parseFloat(document.getElementById('timeBandwidth').value);
                 if (btValue < 0.3 || btValue > 0.5) {
                     alert("Please enter a BT value between 0.3 and 0.5.");
+			window.location.reload(true); 
                 }
             }
 
