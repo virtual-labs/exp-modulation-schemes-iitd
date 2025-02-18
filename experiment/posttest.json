@@ -113,7 +113,7 @@
       },
       "explanations": {
         "a": "Incorrect. Memory effects do not inherently increase noise resilience.",
-        "b": "Correct! Memory effects can enhance spectral efficiency by allowing smoother transitions.",
+        "b": "Inorrect! Memory effects can enhance spectral efficiency by allowing smoother transitions.",
         "c": "Correct! Memory effects can lead to inter-symbol interference if not managed properly.",
         "d": "Incorrect. While they can improve certain aspects, memory effects can also complicate error rates."
       },
