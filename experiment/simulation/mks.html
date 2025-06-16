@@ -43,14 +43,15 @@
 	<div id = "instructions">
     <h1>Instructions for Minimum Shift Keying Modulation (MSK)</h1>
     <ul>
-        <li>Step 1: Click on 'Generate Message' button to generate input message signal</li>
-		<li>Step 2: Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
-        <li>Step 3: Click on 'Generate Carrier' button to generate carrier signal</li>
-		<li>Step 4: You can change the number of bits, carrier signal frequency and baud rate from the input fields</li>
-        <li>Step 5: Click on 'Generate MSK Signal' button to generate Minimum Shift Keying Signal</li>
-		<li>In MSK, the frequency shift is half the baud rate. MSK represents the "1" bit with a frequency slightly higher 
+        <li class="step step1">Step 1: Click on 'Generate Message' button to generate input message signal</li>
+		<li class="step step2">Step 2: Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
+        <li class="step step3">Step 3: Click on 'Generate Carrier' button to generate carrier signal</li>
+		<li class="step step4">Step 4: You can change the number of bits, carrier signal frequency and baud rate from the input fields</li>
+        <li class="step step1">Step 5: Click on 'Generate MSK Signal' button to generate Minimum Shift Keying Signal</li>
+		<li class="step step2">In MSK, the frequency shift is half the baud rate. MSK represents the "1" bit with a frequency slightly higher 
 		than the carrier, fc + (baud rate)/4 and the "0" bit with a frequency slightly lower 
-		than the carrier, fc + (baud rate)/4.
+		than the carrier, fc - (baud rate)/4.
+    </li>
     </ul>
 	</div>
 	<hr/>
@@ -110,19 +111,19 @@
 					style= "height:250px; width: 550px; margin-left: 40px"
                   />
 				<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[410px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[590px] left-[2px]"
                   onclick="updateBitstream()"
                 >
                   Generate Message
                 </button>
 				<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[450px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[635px] left-[2px]"
                   onclick="plotNRZGraphs(result)"
                 >
                   Generate NRZ<br/>Signal
                 </button>
 								<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[640px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[810px] left-[2px]"
                   onclick="generateCarrierSignal()"
                 >
                   Generate Carrier
@@ -165,6 +166,7 @@
               </div>
 	</div>
 	</div>
+</div>
 	
 	
 	
@@ -173,8 +175,8 @@
 			  <div id = "container">
     <h1>Instructions for Minimum Shift Keying (MSK) Demodulation</h1>
     <ul>
-		<li>Step 1: You can Demodulate the MSK Signal clicking on the 'Demodulate MSK' button</li>
-		<li>The IF filter isolates the desired MSK signal from noise and interference. The delay circuit provides a delayed reference to detect phase transitions between successive bits. 
+		<li class="step step1">Step 1: You can Demodulate the MSK Signal clicking on the 'Demodulate MSK' button</li>
+		<li class="step step2">The IF filter isolates the desired MSK signal from noise and interference. The delay circuit provides a delayed reference to detect phase transitions between successive bits. 
 		<br/>&nbsp&nbsp&nbsp&nbspThe phase shifter adjusts the signal's phase to align it with the local reference, enabling accurate demodulation of the bitstream.</li>
     </ul>
 </div>
@@ -586,29 +588,68 @@ function representDigitalSignal(bitsx) {
     </script>
 	
 	<style>
-	h1 {
-    color: #333;
-    font-size: 22px; /* Increased font size */
-    margin-bottom: 20px;
-}
-	ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    background-color: #e0e7ff;
-    margin: 5px 0;
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 14px; /* Set font size for list items */
+#container {
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 25px 40px;
+  max-width: 100%;
+  margin: 20px auto;
+  text-align: left;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-li::before {
-    content: "✔";
-    color: #4caf50;
-    margin-right: 10px;
+h1 {
+  color: #1e3a8a;
+  font-size: 24px;
+  margin-bottom: 25px;
+  text-align: justify;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li.step {
+  margin: 12px 0;
+  padding: 12px 15px;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+li.step::before {
+  content: "✔";
+  color: #10b981;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+li.step:hover {
+  transform: scale(1.02);
+  background-color: #f3f4f6;
+}
+
+/* Color code each step */
+.step1 {
+  background-color: #ffe0e0;
+  border-left: 5px solid #ef4444;
+}
+.step2 {
+  background-color: #e0f7ff;
+  border-left: 5px solid #0ea5e9;
+}
+.step3 {
+  background-color: #e0ffe5;
+  border-left: 5px solid #22c55e;
+}
+.step4 {
+  background-color: #f5e0ff;
+  border-left: 5px solid #a855f7;
 }
 	</style>
   </body>

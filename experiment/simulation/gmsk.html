@@ -44,13 +44,13 @@
 	<div id = "instructions">
     <h1>Instructions for Gaussian Minimum Shift Keying Modulation (GMSK)</h1>
     <ul>
-        <li>Step 1: Click on 'Generate Message' button to generate input message signal</li>
-		<li>Step 2: Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
-		<li>Step 3: Then click on 'Generate Filtered Signal' button to generate gaussian filtered signal</li>
-        <li>Step 4: Click on 'Generate Carrier' button to generate carrier signal</li>
-		<li>Step 5: You can change the number of bits, carrier signal frequency and time bandwidth product from the input fields</li>
-        <li>Step 6: Click on 'Generate GMSK Signal' button to generate Gaussian Minimum Shift Keying Signal</li>
-		<li>In GMSK, The filtered NRZ signal (which is now smoothed by the Gaussian filter)
+        <li class="step step1">Step 1: Click on 'Generate Message' button to generate input message signal</li>
+		<li class="step step2">Step 2: Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
+		<li class="step step3">Step 3: Then click on 'Generate Filtered Signal' button to generate gaussian filtered signal</li>
+        <li class="step step4">Step 4: Click on 'Generate Carrier' button to generate carrier signal</li>
+		<li class="step step1">Step 5: You can change the number of bits, carrier signal frequency and time bandwidth product from the input fields</li>
+        <li class="step step2">Step 6: Click on 'Generate GMSK Signal' button to generate Gaussian Minimum Shift Keying Signal</li>
+		<li class="step step3">In GMSK, The filtered NRZ signal (which is now smoothed by the Gaussian filter)
 		is integrated over time to produce a phase signal. This is the key step that ensures 
 		continuous phase transitions, which is the hallmark of GMSK. <br/>&nbsp&nbsp&nbsp&nbsp&nbsp The integration ensures that the phase of the carrier changes
 		gradually, avoiding abrupt phase transitions and maintaining phase continuity.</li>
@@ -111,7 +111,7 @@
 	<hr/>
 	
 	<div class = "container">
-	<div class = "left-half">
+	<div class = "left-half relative">
 	          <div class="flex gap-1">
               <div class="flex-1 flex flex-col items-center">
                 <div class="w-full">
@@ -122,25 +122,25 @@
 					style= "height:300px; width: 650px; margin-left: 40px"
                   />
 				<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute bottom-[450px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[45px] left-[2px]"
                   onclick="plotMessageSignal()"
                 >
                   Generate Message
                 </button>
 				<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute bottom-[400px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[85px] left-[2px]"
                   onclick="generateAndPlot()"
                 >
                   Generate NRZ Signal
                 </button>
 				<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute bottom-[200px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[240px] left-[2px]"
                   onclick="plotFilteredSignal()"
                 >
                   Generate Filtered<br/>Signal
                 </button>
 								<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute bottom-[150px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[310px] left-[2px]"
                   onclick="generateCarrierSignal()"
                 >
                   Generate Carrier
@@ -197,8 +197,8 @@
 			  <div id = "container">
     <h1>Instructions for Gaussian Minimum Shift Keying (GMSK) Demodulation</h1>
     <ul>
-		<li>Step 1: You can Demodulate the GMSK Signal clicking on the 'Demodulate GMSK' button</li>
-		<li>In GMSK demodulation, the low-pass filter (LPF) removes high-frequency noise, isolating the baseband signal. The phase estimator extracts the signal's phase, which carries the encoded data. The deviator converts phase changes into 
+		<li class="step step1">Step 1: You can Demodulate the GMSK Signal clicking on the 'Demodulate GMSK' button</li>
+		<li class="step step2">In GMSK demodulation, the low-pass filter (LPF) removes high-frequency noise, isolating the baseband signal. The phase estimator extracts the signal's phase, which carries the encoded data. The deviator converts phase changes into 
 		<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp frequency deviations to retrieve the transmitted data, and the decision circuit interprets these deviations, converting them into binary data (0s and 1s) based on set thresholds.</li>
     </ul>
 </div>
@@ -556,29 +556,68 @@ function plotModulatedSignalReal() {
         }
     </script>	
 	<style>
-	h1 {
-    color: #333;
-    font-size: 22px; /* Increased font size */
-    margin-bottom: 20px;
-}
-	ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    background-color: #e0e7ff;
-    margin: 5px 0;
-    padding: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 14px; /* Set font size for list items */
+#container {
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 25px 40px;
+  max-width: 100%;
+  margin: 20px auto;
+  text-align: left;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-li::before {
-    content: "✔";
-    color: #4caf50;
-    margin-right: 10px;
+h1 {
+  color: #1e3a8a;
+  font-size: 24px;
+  margin-bottom: 25px;
+  text-align: justify;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li.step {
+  margin: 12px 0;
+  padding: 12px 15px;
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+li.step::before {
+  content: "✔";
+  color: #10b981;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+li.step:hover {
+  transform: scale(1.02);
+  background-color: #f3f4f6;
+}
+
+/* Color code each step */
+.step1 {
+  background-color: #ffe0e0;
+  border-left: 5px solid #ef4444;
+}
+.step2 {
+  background-color: #e0f7ff;
+  border-left: 5px solid #0ea5e9;
+}
+.step3 {
+  background-color: #e0ffe5;
+  border-left: 5px solid #22c55e;
+}
+.step4 {
+  background-color: #f5e0ff;
+  border-left: 5px solid #a855f7;
 }
 	</style>
   </body>
