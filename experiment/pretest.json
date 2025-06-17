@@ -2,171 +2,171 @@
   "version": 2.0,
   "questions": [
     {
-      "question": "1. What does MSK stand for in digital communication?",
+      "question": "1. In a coherent receiver for MSK, what is the primary challenge in demodulating the signal accurately?",
       "answers": {
-        "a": "Minimum Shift Keying",
-        "b": "Maximum Shift Keying",
-        "c": "Modulated Shift Keying",
-        "d": "Multi-State Keying"
+        "a": "Maintaining phase synchronization due to continuous phase modulation",
+        "b": "Separating overlapping amplitude levels at the detector",
+        "c": "Tracking the Gaussian filter response over multiple symbols",
+        "d": "Extracting the signal envelope under additive white Gaussian noise"
       },
       "explanations": {
-        "a": "Correct! MSK stands for Minimum Shift Keying, a type of frequency modulation.",
-        "b": "Incorrect. Maximum Shift Keying is not a recognized term in modulation.",
-        "c": "Incorrect. Modulated Shift Keying is not a correct terminology.",
-        "d": "Incorrect. Multi-State Keying is not specific to MSK."
+        "a": "Correct. MSK requires precise phase tracking due to its continuous phase nature, making coherent demodulation challenging.",
+        "b": "Incorrect. MSK does not use multiple amplitude levels, so amplitude separation is not an issue.",
+        "c": "Incorrect. This is more relevant for GMSK where Gaussian filtering introduces memory.",
+        "d": "Incorrect. MSK uses constant envelope, so envelope detection is not used."
       },
       "correctAnswer": "a",
       "difficulty": "intermediate"
     },
     {
-      "question": "2. Which of the following is a key characteristic of GMSK?",
+      "question": "2. In GMSK, the memory introduced by Gaussian filtering primarily affects which aspect of the modulation?",
       "answers": {
-        "a": "It uses a Gaussian filter to smooth the signal.",
-        "b": "It requires more bandwidth than MSK.",
-        "c": "It operates without any filtering.",
-        "d": "It is a type of amplitude modulation."
+        "a": "The symbol's phase depends on multiple previous bits",
+        "b": "The carrier frequency is no longer stable",
+        "c": "Amplitude varies over time due to ISI",
+        "d": "Receiver requires non-coherent detection"
       },
       "explanations": {
-        "a": "Correct! GMSK uses a Gaussian filter to minimize spectral spreading.",
-        "b": "Incorrect. GMSK actually requires less bandwidth compared to MSK.",
-        "c": "Incorrect. GMSK cannot operate without filtering.",
-        "d": "Incorrect. GMSK is a type of frequency modulation, not amplitude modulation."
+        "a": "Correct. The phase is influenced by a pulse-shaped filter spreading bit transitions.",
+        "b": "Carrier frequency remains stable.",
+        "c": "GMSK maintains constant envelope modulation.",
+        "d": "GMSK typically uses coherent detection."
       },
       "correctAnswer": "a",
       "difficulty": "intermediate"
     },
     {
-      "question": "3. What advantage does GMSK have over MSK?",
+      "question": "3. What is the key trade-off introduced when applying a narrow Gaussian filter in GMSK modulation?",
       "answers": {
-        "a": "Higher spectral efficiency",
-        "b": "Lower complexity",
-        "c": "No memory effect",
-        "d": "Higher bit error rate"
+        "a": "Reduced ISI but increased group delay",
+        "b": "Improved power efficiency but reduced BER",
+        "c": "Better spectral compactness but increased ISI",
+        "d": "Lower noise figure but higher Doppler spread"
       },
       "explanations": {
-        "a": "Correct! GMSK provides higher spectral efficiency due to its filtering.",
-        "b": "Incorrect. GMSK can be more complex due to the Gaussian filter.",
-        "c": "Incorrect. GMSK has a memory effect due to the filtering.",
-        "d": "Incorrect. GMSK typically has a lower bit error rate."
-      },
-      "correctAnswer": "a",
-      "difficulty": "intermediate"
-    },
-    {
-      "question": "4. What type of modulation does MSK use?",
-      "answers": {
-        "a": "Phase Shift Keying",
-        "b": "Frequency Shift Keying",
-        "c": "Amplitude Shift Keying",
-        "d": "Quadrature Amplitude Modulation"
-      },
-      "explanations": {
-        "a": "Correct! MSK is a form of Phase Shift Keying.",
-        "b": "Incorrect. While MSK is related to frequency, it specifically modulates phase.",
-        "c": "Incorrect. MSK does not utilize amplitude modulation.",
-        "d": "Incorrect. MSK is not Quadrature Amplitude Modulation."
-      },
-      "correctAnswer": "a",
-      "difficulty": "intermediate"
-    },
-    {
-      "question": "5. In GMSK, the Gaussian filter helps to achieve which of the following?",
-      "answers": {
-        "a": "Reduced out-of-band emissions",
-        "b": "Increased bit rate",
-        "c": "Higher power consumption",
-        "d": "Wider bandwidth"
-      },
-      "explanations": {
-        "a": "Correct! The Gaussian filter reduces out-of-band emissions, improving spectral efficiency.",
-        "b": "Incorrect. The bit rate is not directly increased by the Gaussian filter.",
-        "c": "Incorrect. GMSK aims to minimize power consumption.",
-        "d": "Incorrect. GMSK typically achieves narrower bandwidth."
-      },
-      "correctAnswer": "a",
-      "difficulty": "intermediate"
-    },
-    {
-      "question": "6. Which of the following modulation schemes has the lowest bit error rate in noisy environments?",
-      "answers": {
-        "a": "MSK",
-        "b": "GMSK",
-        "c": "PSK",
-        "d": "ASK"
-      },
-      "explanations": {
-        "a": "Incorrect. MSK is effective in noisy environments but typically GMSK performs better.",
-        "b": "Correct! GMSK usually has a lower bit error rate than MSK in noisy conditions.",
-        "c": "Incorrect. PSK can also perform well, but GMSK is optimized for noise.",
-        "d": "Incorrect. ASK is more susceptible to noise and has a higher bit error rate."
-      },
-      "correctAnswer": "b",
-      "difficulty": "intermediate"
-    },
-    {
-      "question": "7. What is a primary application of GMSK modulation?",
-      "answers": {
-        "a": "Television broadcasting",
-        "b": "Satellite communication",
-        "c": "GSM cellular networks",
-        "d": "Wi-Fi networks"
-      },
-      "explanations": {
-        "a": "Incorrect. GMSK is not commonly used in television broadcasting.",
-        "b": "Incorrect. Satellite communication typically uses different modulation schemes.",
-        "c": "Correct! GMSK is widely used in GSM cellular networks for efficient data transmission.",
-        "d": "Incorrect. Wi-Fi networks usually use different modulation techniques."
+        "a": "Incorrect. Narrow filters increase ISI, not reduce it.",
+        "b": "Power efficiency is unrelated to Gaussian filter directly.",
+        "c": "Correct. A narrow Gaussian filter reduces spectral spread but introduces memory, increasing ISI.",
+        "d": "Doppler spread is unrelated to baseband filter width."
       },
       "correctAnswer": "c",
       "difficulty": "intermediate"
     },
     {
-      "question": "8. How does MSK differ from conventional FSK?",
+      "question": "4. MSK can be viewed as a special case of which general modulation format?",
       "answers": {
-        "a": "MSK uses a continuous phase.",
-        "b": "MSK has higher bandwidth requirements.",
-        "c": "MSK modulates amplitude.",
-        "d": "MSK is less power efficient."
+        "a": "Continuous Phase Frequency Shift Keying (CPFSK)",
+        "b": "Quadrature Amplitude Modulation (QAM)",
+        "c": "Differential Phase Shift Keying (DPSK)",
+        "d": "Orthogonal Frequency Division Multiplexing (OFDM)"
       },
       "explanations": {
-        "a": "Correct! MSK utilizes continuous phase modulation, differentiating it from conventional FSK.",
-        "b": "Incorrect. MSK typically requires less bandwidth than conventional FSK.",
-        "c": "Incorrect. MSK does not modulate amplitude; it modulates phase.",
-        "d": "Incorrect. MSK is designed to be power efficient."
+        "a": "Correct. MSK is CPFSK with modulation index 0.5.",
+        "b": "QAM involves amplitude and phase variation, which MSK avoids.",
+        "c": "MSK uses absolute phase, not differential.",
+        "d": "OFDM is multicarrier, unrelated to MSK structure."
       },
       "correctAnswer": "a",
       "difficulty": "intermediate"
     },
     {
-      "question": "9. What is the bandwidth efficiency of GMSK compared to traditional MSK?",
+      "question": "5. Which mathematical property ensures that MSK has a constant envelope signal?",
       "answers": {
-        "a": "Higher bandwidth efficiency",
-        "b": "Lower bandwidth efficiency",
-        "c": "Equal bandwidth efficiency",
-        "d": "Dependent on modulation index"
+        "a": "The use of sinusoidal basis functions with orthogonal frequency shifts",
+        "b": "The matched filtering in the receiver stage",
+        "c": "The Gaussian pulse shaping filter at the transmitter",
+        "d": "The quadrature nature of I and Q components with synchronized transitions"
       },
       "explanations": {
-        "a": "Correct! GMSK achieves higher bandwidth efficiency due to Gaussian filtering.",
-        "b": "Incorrect. GMSK has better bandwidth efficiency than traditional MSK.",
-        "c": "Incorrect. GMSK is more efficient than traditional MSK.",
-        "d": "Incorrect. While modulation index affects efficiency, GMSK is generally more efficient."
+        "a": "Correct. Constant envelope is preserved because of orthogonal, phase-continuous sinusoidal shifts.",
+        "b": "Matched filtering helps optimize SNR but does not affect envelope shape.",
+        "c": "Gaussian filters are used in GMSK, not MSK.",
+        "d": "True for GMSK, but not the root cause in MSK."
       },
       "correctAnswer": "a",
       "difficulty": "intermediate"
     },
     {
-      "question": "10. What is the modulation index in MSK?",
+      "question": "6. Why is GMSK preferred over MSK in systems like GSM even though it increases detection complexity?",
       "answers": {
-        "a": "1",
-        "b": "0.5",
-        "c": "2",
-        "d": "0"
+        "a": "It reduces adjacent channel interference significantly",
+        "b": "It uses variable amplitude for better control",
+        "c": "It allows higher data rates without ISI",
+        "d": "It simplifies synchronization and equalization"
       },
       "explanations": {
-        "a": "Correct! The modulation index for MSK is defined as 1.",
-        "b": "Incorrect. The modulation index for MSK is not 0.5.",
-        "c": "Incorrect. The modulation index for MSK is not 2.",
-        "d": "Incorrect. The modulation index cannot be 0 in MSK."
+        "a": "Correct. GMSK has excellent spectral compactness due to narrow Gaussian filtering.",
+        "b": "Incorrect. GMSK has constant envelope.",
+        "c": "GMSK introduces memory, which slightly increases ISI.",
+        "d": "GMSK actually complicates equalization due to its memory effect."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "7. In the context of bit error probability, why does MSK perform similarly to BPSK over AWGN channels?",
+      "answers": {
+        "a": "Both use orthogonal signaling with coherent detection",
+        "b": "Both have minimum Euclidean distance between symbols",
+        "c": "MSK is equivalent to BPSK with phase continuity constraint",
+        "d": "MSK uses two amplitude levels just like BPSK"
+      },
+      "explanations": {
+        "a": "MSK tones are not orthogonal in the same way as FSK.",
+        "b": "Distance isn't the same due to waveform overlap.",
+        "c": "Correct. MSK can be considered a continuous phase version of BPSK.",
+        "d": "MSK doesn’t vary amplitude at all."
+      },
+      "correctAnswer": "c",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "8. Which condition must be satisfied for MSK signals to maintain orthogonality over the bit interval?",
+      "answers": {
+        "a": "Frequency spacing = 1/(2 × bit duration)",
+        "b": "Symbol rate equals sampling rate",
+        "c": "Amplitude scaling factor equals √2",
+        "d": "Gaussian filter bandwidth-time product equals 0.3"
+      },
+      "explanations": {
+        "a": "Correct. Orthogonality in MSK requires this spacing.",
+        "b": "Sampling rate is unrelated to symbol orthogonality.",
+        "c": "Amplitude doesn’t determine orthogonality.",
+        "d": "BT = 0.3 is a GMSK property, not MSK."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "9. In practical implementation of GMSK, what makes the Viterbi algorithm suitable for demodulation?",
+      "answers": {
+        "a": "GMSK introduces memory that can be modeled as a finite-state machine",
+        "b": "Viterbi decoding always improves BER in all modulation schemes",
+        "c": "The Viterbi algorithm simplifies Gaussian filtering",
+        "d": "It allows direct extraction of frequency deviation"
+      },
+      "explanations": {
+        "a": "Correct. GMSK introduces memory, and Viterbi provides ML decoding with memory channels.",
+        "b": "Viterbi is for maximum likelihood, not universally applicable.",
+        "c": "Filtering is independent of decoding strategy.",
+        "d": "Not relevant to Viterbi’s purpose."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "10. The eye diagram of GMSK typically appears closed compared to MSK because:",
+      "answers": {
+        "a": "Gaussian filtering introduces ISI and phase memory",
+        "b": "The phase deviation exceeds π per symbol",
+        "c": "It uses amplitude modulation under Gaussian noise",
+        "d": "Higher sampling rates are used in GMSK"
+      },
+      "explanations": {
+        "a": "Correct. The memory introduced by Gaussian filter causes ISI and smearing in the eye diagram.",
+        "b": "Phase deviation in GMSK is limited to ensure continuity.",
+        "c": "There is no amplitude modulation in GMSK.",
+        "d": "Sampling rate does not cause eye diagram closure."
       },
       "correctAnswer": "a",
       "difficulty": "intermediate"
