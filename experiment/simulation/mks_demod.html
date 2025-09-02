@@ -40,38 +40,41 @@
   <body>
     <!-- sidebar and body -->
 	    <!-- sidebar and body -->
-	<div id = "instructions">
-    <h1>Instructions for Minimum Shift Keying Modulation (MSK)</h1>
-    <ul>
-      <li class="step step4"><strong>Note:</strong> Use the input fields to enter the number of bits, carrier frequency (Hz), and the baud rate (Hz)</li>
-
-        <li class="step step1"><strong>Step 1:</strong> Click on 'Generate Message' button to generate input message signal</li>
-		<li class="step step2"><strong>Step 2:</strong> Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
-        <li class="step step3"><strong>Step 3:</strong> Click on 'Generate Carrier' button to generate carrier signal</li>
-        <li class="step step1"><strong>Step 4:</strong> Click on 'Generate MSK Signal' button to generate Minimum Shift Keying Signal</li>
-		<li class="step step2">In MSK, the frequency shift is half the baud rate. MSK represents the "1" bit with a frequency slightly higher 
-		than the carrier, fc + (baud rate)/4 and the "0" bit with a frequency slightly lower 
-		than the carrier, fc - (baud rate)/4.
-    </li>
-    </ul>
-	</div>
-	<hr/>
-	<br>
-    <div class="flex min-h-[10vh]">
-      <div class="px-6 pb-6 mt-1 flex-1">
-        <div class="">
+<div id = "modulation">
+      <div id="instructions">
+        <h1>Instructions for Minimum Shift Keying Modulation (MSK)</h1>
+        <ul>
+          <li class="step step4">
+            <strong>Note:</strong> Use the input fields to enter the number of bits, carrier frequency (Hz), and the baud rate (Hz)
+          </li>
+      
+          <li class="step step1"><strong>Step 1:</strong> Click on 'Generate Message' button to generate input message signal</li>
+          <li class="step step2"><strong>Step 2:</strong> Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
+          <li class="step step3"><strong>Step 3:</strong> Click on 'Generate Carrier' button to generate carrier signal</li>
+          <li class="step step1"><strong>Step 4:</strong> Click on 'Generate MSK Signal' button to generate Minimum Shift Keying Signal</li>
+          <li class="step step2">
+            In MSK, the frequency shift is half the baud rate. MSK represents the "1" bit with a frequency slightly higher 
+            than the carrier, fc + (baud rate)/4 and the "0" bit with a frequency slightly lower 
+            than the carrier, fc - (baud rate)/4.
+          </li>
+        </ul>
+      </div>
+      
+      <hr/>
+      <br/>
+      
+      <div class="flex min-h-[10vh]">
+        <div class="px-6 pb-6 mt-1 flex-1">
           <div class="flex flex-col justify-center">
             <div class="flex max-lg:flex-col gap-x-12 gap-y-2 mt-2">
-              <div class="">
-                <div class="flex items-center justify-center gap-1">
-                  <label for="bitstreamInput">Number of Bits:</label>
-                  <input
-                    class="max-lg:ml-10 border border-black px-2 py-1 rounded-sm"
-                    type="number"
-                    id="bitstreamInput"  
-                    value="4"
-                  />
-                </div>
+              <div class="flex items-center justify-center gap-1">
+                <label for="bitstreamInput">Number of Bits:</label>
+                <input
+                  class="max-lg:ml-10 border border-black px-2 py-1 rounded-sm"
+                  type="number"
+                  id="bitstreamInput"
+                  value="4"
+                />
               </div>
               <div class="flex items-center justify-center gap-1 mt-2">
                 <label for="carrierFrequencyInput">Carrier Frequency (Hz):</label>
@@ -91,87 +94,79 @@
                   value="4"
                 />
               </div>
-
-              </div>
             </div>
-            </div>
+          </div>
         </div>
       </div>
-    </div>
-	<hr/>
-	
-	<div class = "container">
-	<div class = "left-half">
-	          <div class="flex gap-1">
-              <div class="flex-1 flex flex-col items-center">
-                <div class="w-full">
-				<br/><br/><br/><br/>
-                  <img
-                    src="msk_mod.png"
-                    alt="psk1" 
-					style= "height:250px; width: 550px; margin-left: 40px"
-                  />
-				<button
+      
+      <hr/>
+      
+      <div class="container">
+        <div class="left-half">
+          <div class="flex gap-1">
+            <div class="flex-1 flex flex-col items-center">
+              <div class="w-full">
+                <br/><br/><br/><br/>
+                <img
+                  src="msk_mod.png"
+                  alt="psk1"
+                  style="height:250px; width: 550px; margin-left: 40px"
+                />
+                <button
                   class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[590px] left-[2px]"
                   onclick="updateBitstream()"
                 >
                   Generate Message
                 </button>
-				<button
+                <button
                   class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[635px] left-[2px]"
                   onclick="plotNRZGraphs(result)"
                 >
                   Generate NRZ<br/>Signal
                 </button>
-								<button
+                <button
                   class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[810px] left-[2px]"
                   onclick="generateCarrierSignal()"
                 >
                   Generate Carrier
                 </button>
-				
-			    <button
+                <button
                   class="button bg-blue-500 text-white rounded-md px-2 py-1 relative bottom-[100px] left-[400px]"
                   onclick="plotModulated()"
                 >
                   Generate MSK Signal
                 </button>
-	<!--		
-					                <button
+                <!--
+                <button
                   class="button bg-gray-500 text-white rounded-md px-2 py-1 relative top-[100px] right-[0px]"
                   onclick="plotDemodulated()"
                 >
-                Perform Demodulation
+                  Perform Demodulation
                 </button>
-	-->				
+                -->
               </div>
-              </div>
-			  </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="right-half">
+          <div id="scrolltomessage" class="flex items-center gap-2 justify-center max-lg:flex-col">
+            <div id="digitalPlot" class="w-[600px] h-[450px]"></div>
+          </div>
+          <div id="scrolltonrz" class="flex items-center gap-2 justify-center max-lg:flex-col">
+            <div id="nrzPlot" class="w-[600px] h-[450px]"></div>
+          </div>
+          <div id="scrolltocarrier" class="flex items-center gap-2 justify-center max-lg:flex-col">
+            <div id="carrier-plot" class="w-[600px] h-[450px]"></div>
+          </div>
+          <div id="scrolltomodulated" class="flex items-center gap-2 justify-center max-lg:flex-col">
+            <div id="mskModulatedPlot" class="w-[600px] h-[450px]"></div>
+          </div>
+        </div>
+      </div>
 
-	</div>
+    </div>     	
 
-
-				
-	<div class = "right-half">
-	            <div id = "scrolltomessage" class="flex items-center gap-2 justify-center max-lg:flex-col">
-              <div id="digitalPlot" class="w-[600px] h-[450px]"></div>
-			</div>
-		    <div id = "scrolltonrz" class="flex items-center gap-2 justify-center max-lg:flex-col">
-              <div id="nrzPlot" class="w-[600px] h-[450px]"></div>
-			</div>
-			<div id = "scrolltocarrier" class="flex items-center gap-2 justify-center max-lg:flex-col">
-              <div id="carrier-plot" class="w-[600px] h-[450px]"></div>
-			</div>
-			<div id = "scrolltomodulated" class="flex items-center gap-2 justify-center max-lg:flex-col">
-                <div id="mskModulatedPlot" class="w-[600px] h-[450px]"></div>
-              </div>
-	</div>
-	</div>
-</div>
-	
-	
-	
-<div id = "demodulation">
 	    <!-- sidebar and body -->
 			  <div id = "container">
     <h1>Instructions for Minimum Shift Keying (MSK) Demodulation</h1>
@@ -227,9 +222,6 @@
         <!--  -->
       </div>
     </div>
-
-  </div>
-
 			<script>	
 		        function checkFrequencies() {
             // Get values from input fields
@@ -263,6 +255,7 @@
 	let baudRateformessage = 1;
 	let result = [];
 	let num_bits = 10;
+  let bitstreamArray = [];
 
 		
         function modulateMSK(bitstream, fc, baud, Fs) {
@@ -454,10 +447,14 @@ function representDigitalSignal(bitsx) {
             Plotly.newPlot('mskModulatedPlot', mskModulatedData, mskModulatedLayout);
 		    document.getElementById('scrolltomodulated').scrollIntoView({ behavior: 'smooth' });
 
-        saveData(); 
             }
-			
+
+let k1, scaledTime1, digitalDemodulatedSignal;
 function plotDemodulated() {
+  //updateBitstream();
+  plotNRZGraphs(result);
+generateCarrierSignal();
+plotModulated();
     // Get the baud rate and compute scaling factor for time
     let k1 = 10000 / baudRateformessage; // Replace with your desired constant
 
@@ -589,20 +586,29 @@ function representDigitalSignal(bitsx) {
 }
 
 
-function saveData() {
+function loadData() {
+  const data = localStorage.getItem('sharedData');
+  if (data) {
+    const parsed = JSON.parse(data);
 
-// Store as an object (use the variables you actually defined)
-const num_bits = document.getElementById("bitstreamInput").value;
-const carrierFrequency = parseFloat(document.getElementById("carrierFrequencyInput").value);
-const baudRate = parseFloat(document.getElementById("baudRateInput").value);
-const myData = { num_bits: num_bits, carrierFrequency: carrierFrequency, baudRate: baudRate, result: result };
-localStorage.setItem('sharedData', JSON.stringify(myData));
+document.getElementById('bitstreamInput').value = parsed.num_bits ?? '';
+    document.getElementById('carrierFrequencyInput').value = parsed.carrierFrequency ?? '';
+    document.getElementById('baudRateInput').value = parsed.baudRate ?? '';
+	
+    result = parsed.result ?? null;
+  }
 }
+
+// Load immediately
+loadData();
+
+// Update if storage changes (works across tabs)
+window.addEventListener('storage', loadData);
 
     </script>
 	
 	<style>
-    #demodulation {
+    #modulation {
       display: none;
     }
 #container {
