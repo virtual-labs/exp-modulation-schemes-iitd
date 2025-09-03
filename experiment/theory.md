@@ -1,5 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
         <h2>Minimum Shift Keying (MSK)</h2>
         <p>In digital modulation, <strong>minimum-shift keying (MSK)</strong> is a type of continuous-phase frequency-shift keying. Similar to OQPSK, MSK is encoded with bits alternating between quadrature components, with the Q component delayed by half the symbol period.</p>
         <p>However, instead of square pulses as OQPSK uses, MSK encodes each bit as a half sinusoid. This results in a constant-modulus signal, which reduces problems caused by non-linear distortion. In addition to being viewed as related to OQPSK, MSK can also be viewed as a continuous phase frequency shift keyed (CPFSK) signal with a frequency separation of one half the bit rate. This specific frequency separation ensures that the phase shift over a bit period is exactly ±π/2.</p>
@@ -12,7 +17,6 @@
   where \( a_I(t) \) and \( a_Q(t) \) encode the even and odd information respectively with a sequence of square pulses of duration \( 2T \), and \( \omega_c \) is the carrier angular frequency. Using the trigonometric identity, this can be rewritten in a form where the phase and frequency modulation are more obvious:
 </p>
         <div class="equation">
-            $$s(t) = \cos\left(\omega_c t + \phi_k(t)\right)$$
             <p>where the continuously-varying phase \( \phi_k(t) \) is given by:</p>
             $$\phi_k(t) = b(t) \frac{\pi t}{2T} + \phi_0$$
         </div>
@@ -40,3 +44,5 @@
         <div class="note">
             <p>While GMSK offers superior spectral characteristics, the Gaussian filtering introduces inter-symbol interference (ISI). This ISI makes demodulation slightly more complex, often requiring more sophisticated equalization techniques at the receiver. Despite this, GMSK is widely used in applications like GSM (Global System for Mobile Communications) due to its excellent spectral efficiency and constant envelope property, which allows for the use of highly efficient, non-linear power amplifiers.</p>
         </div>
+</body>
+</html>
