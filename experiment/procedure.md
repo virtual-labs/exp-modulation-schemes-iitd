@@ -14,7 +14,7 @@
     <h3>2. Generating the Signal</h3>
     <p>After entering the input parameters, click the <strong>"Generate Messsage"</strong> button to initiate the signal generation process. The simulator will compute the generated bits and relevant parameters based on your input.</p>
     <h3>3. Viewing Output</h3>
-	<p>The simulator will display the output below the input fields. It will show the transmitted signal based on the selected modulation scheme, carrier frequency, and symbol rate (baud rate).</p>
+	<p>The simulator will display the output below the input fields. It will show the output signal based on the selected modulation scheme, carrier frequency, and symbol rate (baud rate).</p>
     <h3>4. Analyzing Results</h3>
     <p>Review the generated output to understand the effects of the selected parameters. You may visualize the signal or analyze its properties based on the modulation scheme used.</p>
     <h3>5. Adjusting Parameters</h3>
