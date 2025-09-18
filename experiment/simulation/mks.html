@@ -49,7 +49,9 @@
 		<li class="step step2"><strong>Step 2:</strong> Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
         <li class="step step3"><strong>Step 3:</strong> Click on 'Generate Carrier' button to generate carrier signal</li>
         <li class="step step1"><strong>Step 4:</strong> Click on 'Generate MSK Signal' button to generate Minimum Shift Keying Signal</li>
-		<li class="step step2">In MSK, the frequency shift is half the baud rate. MSK represents the "1" bit with a frequency slightly higher 
+        <li class="step step1"><strong>Step 5:</strong> Click on 'Show Frequency Spectrum' button to view the spectrum of MSK</li>
+
+        <li class="step step2">In MSK, the frequency shift is half the baud rate. MSK represents the "1" bit with a frequency slightly higher 
 		than the carrier, fc + (baud rate)/4 and the "0" bit with a frequency slightly lower 
 		than the carrier, fc - (baud rate)/4.
     </li>
@@ -112,19 +114,19 @@
 					style= "height:250px; width: 550px; margin-left: 40px"
                   />
 				<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[590px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[610px] left-[2px]"
                   onclick="updateBitstream()"
                 >
                   Generate Message
                 </button>
 				<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[635px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[645px] left-[2px]"
                   onclick="plotNRZGraphs(result)"
                 >
                   Generate NRZ<br/>Signal
                 </button>
 								<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[810px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[860px] left-[2px]"
                   onclick="generateCarrierSignal()"
                 >
                   Generate Carrier
@@ -136,6 +138,13 @@
                 >
                   Generate MSK Signal
                 </button>
+
+                <button
+                class="button bg-gray-500 text-white rounded-md px-2 py-1 relative bottom-[-30px] left-[-25px]"
+                onclick="spectrum()"
+              >
+                Show Frequency Spectrum
+              </button>
 	<!--		
 					                <button
                   class="button bg-gray-500 text-white rounded-md px-2 py-1 relative top-[100px] right-[0px]"
@@ -164,6 +173,9 @@
 			</div>
 			<div id = "scrolltomodulated" class="flex items-center gap-2 justify-center max-lg:flex-col">
                 <div id="mskModulatedPlot" class="w-[600px] h-[450px]"></div>
+              </div>
+              <div id = "scrolltospectrum" class="flex items-center gap-2 justify-center max-lg:flex-col">
+                <div id="spectrum" class="w-[600px] h-[450px]"></div>
               </div>
 	</div>
 	</div>
@@ -586,6 +598,73 @@ function representDigitalSignal(bitsx) {
     }
 
     return { bitx: flattenedBitSignal, tx: time };
+}
+
+
+// safe sinc
+function sinc(x) {
+  if (Math.abs(x) < 1e-12) return 1.0;
+  return Math.sin(Math.PI * x) / (Math.PI * x);
+}
+
+function mskPSD_val(f, T) {
+  const x = f * T;
+  const s = sinc(x);
+  const c = Math.cos(Math.PI * x / 2.0);
+  return (s * s) * (c * c);
+}
+
+function gmskFactorSquared(f, T, BT) {
+  const arg = Math.PI * f * T * BT / Math.sqrt(Math.log(2));
+  return Math.exp(-(arg * arg));
+}
+
+function spectrum() {
+  let Rb = parseFloat(document.getElementById('baudRateInput').value) || 1000;
+  let carrierFrequency = parseFloat(document.getElementById('carrierFrequencyInput').value);
+  const BT = 0.3;
+  const fRangeNorm = 3;
+
+  const T = 1.0 / Rb;
+  const N = 4096;
+  const fMax = fRangeNorm * Rb;
+  const f = new Array(N);
+  for (let i = 0; i < N; i++) {
+    f[i] = -fMax + (2 * fMax) * i / (N - 1);
+  }
+
+  const Smsk = new Array(N);
+  const Sgmsk = new Array(N);
+  for (let i = 0; i < N; i++) {
+    const val_msk = mskPSD_val(f[i], T);
+    const gf2 = gmskFactorSquared(f[i], T, BT);
+    Smsk[i] = val_msk;
+    Sgmsk[i] = val_msk * gf2;
+  }
+
+  const eps = 1e-15;
+  const maxMsk = Math.max(...Smsk) + eps;
+  const maxGmsk = Math.max(...Sgmsk) + eps;
+  /*
+  const SmskDB = Smsk.map(v => 10 * Math.log10(Math.max(v / maxMsk, eps)));
+  const SgmskDB = Sgmsk.map(v => 10 * Math.log10(Math.max(v / maxGmsk, eps)));
+  */
+    const SmskDB = Smsk.map(v => 10 * Math.log10(Math.max(v / maxMsk, eps)) - 10*Math.log10(Rb));
+  const SgmskDB = Sgmsk.map(v => 10 * Math.log10(Math.max(v / maxGmsk, eps)) - 10*Math.log10(Rb));
+
+  // x-axis is now in Hz (no normalization)
+  const traceM = { x: f.map(value => value + carrierFrequency), y: SmskDB, name: 'MSK (theory)', mode:'lines', line:{width:2} };
+  //const traceG = { x: f, y: SgmskDB, name: `GMSK (BT=${BT}) (approx)`, mode:'lines', line:{width:2} };
+
+  const layout = {
+    title: `Spectrum of MSK`,
+    xaxis: { title: 'Frequency (Hz)', zeroline:false },
+    yaxis: { title: 'PSD (dB/Hz)', range: [ -120, -1 ] },
+    //legend: { x: 0.98, y: 0.90 }
+  };
+
+  Plotly.newPlot('spectrum', [traceM], layout, {responsive: true});
+  document.getElementById('scrolltospectrum').scrollIntoView({ behavior: 'smooth' });
 }
 
 
