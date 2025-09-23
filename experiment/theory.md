@@ -21,6 +21,14 @@
             $$\phi_k(t) = b(t) \frac{\pi t}{2T} + \phi_0$$
         </div>
 <p>
+So, this can be rewritten in a form where the phase and frequency modulation are more obvious, 
+</p>
+        <div class="equation">
+            $$
+s(t) = \cos \Bigg( \omega_c t + b(t) \frac{\pi t}{2T} + \phi_0 \Bigg)
+$$
+        </div>
+<p>
   Here, \( b(t) \) is +1 when \( a_I(t) = a_Q(t) \) and -1 if they are of opposite signs, and \( \phi_0 \) is an initial phase offset which depends on the previous symbols. The phase changes continuously and linearly within each bit period, and the transitions occur at multiples of \( T \).
 </p>
         <h3>Reason for Minimum Shift Keying, MSK</h3>
