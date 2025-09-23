@@ -439,6 +439,7 @@ Plotly.newPlot('filtered-signal', [{
 			            document.getElementById('scrolltofilteredsignal').scrollIntoView({ behavior: 'smooth' });
 }
 
+let m_filtered3_real;
 function plotModulatedSignalReal() {
     // Initialize parameters
     const carrierFreq = parseInt(document.getElementById('carrierFreq').value);
@@ -458,7 +459,7 @@ function plotModulatedSignalReal() {
     const carrier_sin = t1.map((t) => Math.sin(2 * Math.PI * carrierFreq * t));
 
     // Generate the GMSK modulated signal with carrier
-    const m_filtered3_real = m_filtered1.map((val, idx) => Math.cos(val) * carrier_cos[idx]);
+     m_filtered3_real = m_filtered1.map((val, idx) => Math.cos(val) * carrier_cos[idx]);
     const m_filtered3_imag = m_filtered1.map((val, idx) => Math.sin(val) * carrier_sin[idx]);
 
     // Plot the GMSK modulated signal (Real Part)
@@ -657,7 +658,8 @@ function gmskFactorSquared(f, T, BT) {
     t1: t1,
     rect: rect,
     t_rect: t_rect,
-    rect_step: rect_step
+    rect_step: rect_step,
+    m_filtered3_real: m_filtered3_real
   };
 
   localStorage.setItem("sharedData", JSON.stringify(myData));
