@@ -194,9 +194,15 @@
         </div>
         <div class="mt-4 border-t-2">
           <div class="flex flex-col">
-            <div class="flex justify-center pt-4">
+            <div class="flex justify-center pt-4 gap-2">
               <button
-                class="bg-blue-500 text-white rounded-md px-2 py-1"
+              onclick="MSKInput();"
+              class="bg-blue-500 text-white rounded-md px-3 py-1"
+            >
+              MSK Input
+            </button>
+              <button
+                class="bg-blue-500 text-white rounded-md px-3 py-1"
                 class="button"
                 onclick="plotDemodulated()"
               >
@@ -213,8 +219,9 @@
                   />
                 </div>
               </div>
-              <div id = "scrolltodemodulated" class="flex items-center gap-2 justify-center max-lg:flex-col">
-              <div id="demodulatedPlot" class="w-[600px] h-[450px]"></div>
+              <div id = "scrolltodemodulated" class="flex flex-col items-center gap-2 justify-center max-lg:flex-col">
+                <div id="MSKInput" class="w-[600px] h-[450px]"></div>
+                <div id="demodulatedPlot" class="w-[600px] h-[450px]"></div>
             </div>
             </div>
           </div>
@@ -584,6 +591,34 @@ function representDigitalSignal(bitsx) {
 
     return { bitx: flattenedBitSignal, tx: time };
 }
+
+
+function MSKInput() {
+            // Plot modulated MSK signal
+            let mskModulatedTrace = {
+                x: result.time,
+                y: result.modulatedSignal,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'MSK Modulated Signal'
+            };
+
+            let mskModulatedLayout = {
+                title: 'MSK Modulated Signal',
+                xaxis: {
+                    title: 'Time (s)'
+					//range: [-0.1, auto] 
+                },
+                yaxis: {
+                    title: 'Amplitude'
+                }
+            };
+
+            let mskModulatedData = [mskModulatedTrace];
+            Plotly.newPlot('MSKInput', mskModulatedData, mskModulatedLayout);
+		    document.getElementById('MSKInput').scrollIntoView({ behavior: 'smooth' });
+
+            }
 
 
 function loadData() {
