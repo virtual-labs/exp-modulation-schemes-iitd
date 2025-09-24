@@ -93,6 +93,14 @@
                   value="4"
                 />
               </div>
+              <div class="flex items-center justify-center gap-1 mt-2">
+              <button 
+              class="bg-green-500 text-white rounded-md px-3 py-1 hover:scale-105"
+              onclick="location.reload();"
+            >
+              Reset Simulator
+            </button>
+            </div>
 
               </div>
             </div>
@@ -145,6 +153,8 @@
               >
                 Show Frequency Spectrum
               </button>
+
+              
 	<!--		
 					                <button
                   class="button bg-gray-500 text-white rounded-md px-2 py-1 relative top-[100px] right-[0px]"
@@ -171,6 +181,9 @@
 			<div id = "scrolltocarrier" class="flex items-center gap-2 justify-center max-lg:flex-col">
               <div id="carrier-plot" class="w-[600px] h-[450px]"></div>
 			</div>
+      <div id = "scrolltophaseplot" class="flex items-center gap-2 justify-center max-lg:flex-col">
+        <div id="phasePlot" class="w-[600px] h-[450px]"></div>
+      </div>
 			<div id = "scrolltomodulated" class="flex items-center gap-2 justify-center max-lg:flex-col">
                 <div id="mskModulatedPlot" class="w-[600px] h-[450px]"></div>
               </div>
@@ -242,6 +255,15 @@
 
   </div>
 
+  <div align = "center">
+    <a href = ".\mks_demod.html">
+    <button
+    class="bg-blue-500 text-white py-1 px-3  rounded-md hover:scale-105"
+  >
+    Perform MSK Demodulation
+  </button>
+  </a>
+  </div>
 			<script>	
 		        function checkFrequencies() {
             // Get values from input fields
@@ -308,6 +330,8 @@
             return [s, t];
         }
 
+
+
         function demodMSK(s, fc, baud, Fs) {
             let T = 1 / baud;
             let samplesPerSymbol = T * Fs;
@@ -349,15 +373,16 @@
             return result;
         }
 
+        let bitstreamArray, baudRate;
         // Function to update bitstream and plot graphs
         function updateBitstream() {
             num_bits = document.getElementById("bitstreamInput").value;
             //let bitstreamArray = bitstreamInput.split(",").map(Number); // Convert comma-separated string to array of numbers
             // Generate random bits
-            let bitstreamArray = Array.from({ length: num_bits }, () => Math.round(Math.random()));
+            bitstreamArray = Array.from({ length: num_bits }, () => Math.round(Math.random()));
             // Retrieve user inputs for carrier frequency and baud rate
             let carrierFrequency = parseFloat(document.getElementById("carrierFrequencyInput").value);
-            let baudRate = parseFloat(document.getElementById("baudRateInput").value);
+            baudRate = parseFloat(document.getElementById("baudRateInput").value);
 
             
             // Update bitstream and replot
@@ -466,6 +491,7 @@ function representDigitalSignal(bitsx) {
             Plotly.newPlot('mskModulatedPlot', mskModulatedData, mskModulatedLayout);
 		    document.getElementById('scrolltomodulated').scrollIntoView({ behavior: 'smooth' });
 
+        basebandPhase(bitstreamArray, fc, baudRate, Fs);
         saveData(); 
             }
 			
@@ -666,6 +692,55 @@ function spectrum() {
   Plotly.newPlot('spectrum', [traceM], layout, {responsive: true});
   document.getElementById('scrolltospectrum').scrollIntoView({ behavior: 'smooth' });
 }
+
+
+function basebandPhase(bitstream, fc, baud, Fs) {
+    // Convert bitstream to -1s and 1s
+    let Dk = bitstream.map(bit => 2 * bit - 1);
+    Dk.unshift(-1); // Add initial value for Dk
+
+    let N = bitstream.length;
+    let T = 1 / baud;
+    let t = [];
+    for (let i = 0; i < N * T * Fs; i++) {
+        t.push(i / Fs);
+    }
+
+    // Calculate Phase Constraint Vector, Xk
+    let Xk = [0];
+    for (let k = 1; k <= N; k++) {
+        Xk[k] = (Xk[k - 1] + ((Math.PI * k) / 2) * (Dk[k - 1] - Dk[k])) % (2 * Math.PI);
+    }
+    Xk.shift();
+
+    // Generate MSK Baseband Phase
+    let phi = [];
+    for (let i = 0; i < t.length; i++) {
+        let symbolIndex = Math.floor(t[i] / T);
+        let Dk_value = Dk[symbolIndex + 1];
+        let Xk_value = Xk[symbolIndex];
+        // Baseband phase
+        phi.push((Math.PI / (2 * T)) * Dk_value * (t[i] - symbolIndex*T) + Xk_value);
+    }
+
+    // Plot baseband phase
+    let trace = {
+        x: t,
+        y: phi,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Baseband Phase'
+    };
+    let layout = {
+        title: "MSK Baseband Phase Evolution",
+        xaxis: { title: "Time (s)" },
+        yaxis: { title: "Phase (rad)" }
+    };
+    Plotly.newPlot("phasePlot", [trace], layout);
+
+    return [phi, t];
+}
+
 
 
 function saveData() {

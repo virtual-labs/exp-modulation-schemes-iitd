@@ -72,7 +72,7 @@
                     class="max-lg:ml-10 border border-black px-2 py-1 rounded-sm"
                     type="number"
                     id="numBits"  
-                    value="10"
+                    value="5"
                   />
                 </div>
               </div>
@@ -103,7 +103,15 @@
                   value="1" readonly
                 />
               </div>
-
+              <div class="flex items-center justify-center gap-1 mt-2">
+                <button 
+                class="bg-green-500 text-white rounded-md px-3 py-1 hover:scale-105"
+                onclick="location.reload();"
+              >
+                Reset Simulator
+              </button>
+              </div>
+              
               </div>
             </div>
             </div>
@@ -192,6 +200,9 @@
 			<div id = "scrolltocarrier" class="flex items-center gap-2 justify-center max-lg:flex-col">
               <div id="carrier-plot" class="w-[600px] h-[450px]"></div>
 			</div>
+      <div id = "scrolltophaseplot" class="flex items-center gap-2 justify-center max-lg:flex-col">
+        <div id="phasePlot" class="w-[600px] h-[450px]"></div>
+      </div>
 			<div id = "scrolltomodulatedReal" class="flex items-center gap-2 justify-center max-lg:flex-col">
                 <div id="modulated-signalReal" class="w-[600px] h-[450px]"></div>
               </div>
@@ -265,6 +276,15 @@
 
   </div>
 
+  <div align = "center">
+    <a href = ".\gmsk_demod.html">
+    <button
+    class="bg-blue-500 text-white py-1 px-3  rounded-md hover:scale-105"
+  >
+    Perform GMSK Demodulation
+  </button>
+  </a>
+  </div>
 			<script>	
 		        function checkFrequencies() {
             // Get values from input fields
@@ -315,7 +335,7 @@
     <script>
 	let numBits = 10;
 	let Tb = 1;
-	let samples = 36;
+	let samples = 8;
 	let rect = [];
 	let m_filtered = [];
 	let m_filtered2_real = [];
@@ -419,7 +439,13 @@ let rect_step = [];
     const gaussfilter = GMSK_gaussian_filter1(Tb, samples);
     
     // Pass message signal through Gaussian LPF
-    m_filtered = convolve(rect, gaussfilter).concat(rect.slice(-1));
+    const m_filtered0 = convolve(rect, gaussfilter).concat(rect.slice(-1));
+    const max_val = Math.max(...m_filtered0);
+const min_val = Math.min(...m_filtered0);
+
+// Normalize the signal to [-1, 1]
+  m_filtered = m_filtered0.map(val => {
+  return 2 * (val - min_val) / (max_val - min_val) - 1});
     
 // Plot the filtered signal
 Plotly.newPlot('filtered-signal', [{
@@ -461,6 +487,23 @@ function plotModulatedSignalReal() {
     // Generate the GMSK modulated signal with carrier
      m_filtered3_real = m_filtered1.map((val, idx) => Math.cos(val) * carrier_cos[idx]);
     const m_filtered3_imag = m_filtered1.map((val, idx) => Math.sin(val) * carrier_sin[idx]);
+
+
+        // Plot the Baseband Phase
+        Plotly.newPlot('phasePlot', [
+        { 
+            x: Array.from({ length: m_filtered1.length }, (_, i) => i * SamplePeriod), // Time vector
+            y: m_filtered1,  // This is the baseband phase
+            type: 'scatter', 
+            mode: 'lines', 
+            name: 'Baseband Phase'
+        }
+    ], 
+    { 
+        title: 'Baseband Phase of GMSK', 
+        xaxis: { title: 'Time (Seconds)' }, 
+        yaxis: { title: 'Phase (radians)' } 
+    });
 
     // Plot the GMSK modulated signal (Real Part)
     Plotly.newPlot('modulated-signalReal', [
