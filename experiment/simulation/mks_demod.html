@@ -612,7 +612,7 @@ function MSKInput() {
             };
 
             let mskModulatedLayout = {
-                title: 'MSK Modulated Signal',
+                title: 'Superimposition of Message Signal and MSK Modulated Signal',
                 xaxis: {
                     title: 'Time (s)'
 					//range: [-0.1, auto] 
@@ -622,7 +622,43 @@ function MSKInput() {
                 }
             };
 
-            let mskModulatedData = [mskModulatedTrace];
+            let baudRatepp = parseFloat(document.getElementById("baudRateInput").value);
+    let k = 10000 / baudRatepp;  // Scaling factor for time
+
+    // Represent the digital signal from the bitstream
+    const digitalSignal1pp = representDigitalSignal(result.bitstream);
+
+    // Convert the bitstream into NRZ format
+    let nrzTrace = {
+        x: digitalSignal1pp.tx,  // Time values scaled
+        y: digitalSignal1pp.bitx.flat(),  // NRZ signal values: 1 -> +1, 0 -> -1
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Message Signal',
+        line: {
+            shape: 'hv'  // Step-like lines for NRZ signal
+        }
+    };
+
+    // Layout for the NRZ plot
+    let nrzLayout = {
+        title: 'NRZ Signal',
+        xaxis: {
+            title: 'Time (s)'
+        },
+        yaxis: {
+            title: 'Voltage Level',
+            range: [-1.1, 1.1]  // Limit y-axis for NRZ (-1, 1)
+        }
+    };
+
+    // Data for NRZ plot
+    let nrzData = [nrzTrace];
+
+    // Plot the NRZ signal using Plotly
+    //Plotly.newPlot('nrzPlot', nrzData, nrzLayout);
+
+            let mskModulatedData = [mskModulatedTrace, nrzTrace];
             Plotly.newPlot('MSKInput', mskModulatedData, mskModulatedLayout);
 		    document.getElementById('MSKInput').scrollIntoView({ behavior: 'smooth' });
 

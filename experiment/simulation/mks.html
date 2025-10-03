@@ -404,6 +404,7 @@
         }
 
         // Function to plot graphs
+        let digitalTrace, digitalLayout;
  function plotGraphs(result) {
     // Get the baud rate and compute scaling factor for time
     baudRateformessage = parseFloat(document.getElementById("baudRateInput").value);
@@ -415,7 +416,7 @@
     // Represent the digital signal from the bitstream
     const digitalSignal = representDigitalSignal(result.bitstream);
 
-    let digitalTrace = {
+    digitalTrace = {
         x: digitalSignal.tx,  // Digital time values
         y: digitalSignal.bitx.flat(),  // Flatten the array of binary bits
         type: 'scatter',
@@ -426,7 +427,7 @@
         }
     };
 
-    let digitalLayout = {
+    digitalLayout = {
         title: 'Original Message Signal',
         xaxis: {
             title: 'Time (s)'
@@ -736,7 +737,18 @@ function basebandPhase(bitstream, fc, baud, Fs) {
         xaxis: { title: "Time (s)" },
         yaxis: { title: "Phase (rad)" }
     };
-    Plotly.newPlot("phasePlot", [trace], layout);
+
+    digitalLayout = {
+  showlegend: false, // for example, hide the legend for the second trace
+};
+
+const combinedLayout = {
+  ...layout,       // Use all properties of layout
+  ...digitalLayout // Merge digitalLayout properties (digital settings override general settings)
+};
+
+    Plotly.newPlot("phasePlot", [trace, digitalTrace], combinedLayout);
+    //Plotly.newPlot('digitalPlot', digitalData, digitalLayout);
 
     return [phi, t];
 }
