@@ -382,8 +382,8 @@ let rect_step = [];
     rect = mm.flatMap(bit => Array(samples).fill(bit));
     
     // Plot the message signal as a binary signal
-    const t_rect = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
-    const rect_step = rect.flatMap((val) => [val, val]);
+    t_rect = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
+    rect_step = rect.flatMap((val) => [val, val]);
     Plotly.newPlot('nrz-signal', [{ x: t_rect, y: rect_step, type: 'scatter', mode: 'lines' }],
       { title: 'NRZ Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
     			//document.getElementById('scrolltocarrier').style.display = 'block';
@@ -590,27 +590,22 @@ plotModulatedSignalReal();
         }
 
 function GMSKInput() {
+  //generateAndPlot();
   /*
-      // Initialize parameters
-      const carrierFreq = parseInt(document.getElementById('carrierFreq').value);
-
-
-// Integrate the filtered data
-const m_filtered1 = math.cumsum(m_filtered);
-
-// Generate the GMSK modulated signal
-m_filtered2_real = m_filtered1.map(val => Math.cos(val));
-m_filtered2_imag = m_filtered1.map(val => Math.sin(val));
-const m_filtered2 = m_filtered2_real.map((val, idx) => math.complex(val, m_filtered2_imag[idx]));
-
-// Generate carrier signal
-const t1 = Array.from({ length: Math.ceil(m_filtered1.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
-const carrier_cos = t1.map((t) => Math.cos(2 * Math.PI * carrierFreq * t));
-const carrier_sin = t1.map((t) => Math.sin(2 * Math.PI * carrierFreq * t));
-
-// Generate the GMSK modulated signal with carrier
-const m_filtered3_real = m_filtered1.map((val, idx) => Math.cos(val) * carrier_cos[idx]);
-const m_filtered3_imag = m_filtered1.map((val, idx) => Math.sin(val) * carrier_sin[idx]);
+  Tb = 1; // bit duration
+    SamplePeriod = Tb * (1 / samples);
+    
+    // Generate random message bits
+    numBits = parseInt(document.getElementById('numBits').value);
+    //mm = m.map(value => value * 2 - 1);
+    const t1 = Array.from({ length: Math.ceil(mm.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
+    
+    // Convert message into a series of unipolar NRZ data.
+    rect = mm.flatMap(bit => Array(samples).fill(bit));
+    
+    // Plot the message signal as a binary signal
+    const t_rectpp = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
+    const rect_steppp = rect.flatMap((val) => [val, val]);
 */
 // Plot the GMSK modulated signal (Real Part)
 Plotly.newPlot('GMSKInput', [
@@ -620,7 +615,8 @@ Plotly.newPlot('GMSKInput', [
         type: 'scatter', 
         mode: 'lines', 
         name: 'In-phase' 
-    }
+    },
+    { x: t_rect, y: rect_step, type: 'scatter', mode: 'lines' }
 ], 
 { 
     title: 'GMSK Modulated Signal (Real Part)', 
