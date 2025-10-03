@@ -403,6 +403,7 @@ let rect_step = [];
 			            document.getElementById('scrolltonrz').scrollIntoView({ behavior: 'smooth' });
 	}
 	
+  
 	function plotMessageSignal() {
 	    // Initialize parameters
     Tb = 1; // bit duration
@@ -417,8 +418,8 @@ let rect_step = [];
     rect = m.flatMap(bit => Array(samples).fill(bit));
     
     // Plot the message signal as a binary signal
-    const t_rect = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
-    const rect_step = rect.flatMap((val) => [val, val]);
+    t_rect = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
+    rect_step = rect.flatMap((val) => [val, val]);
     Plotly.newPlot('message-signal', [{ x: t_rect, y: rect_step, type: 'scatter', mode: 'lines' }],
       { title: 'Message Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
     			//document.getElementById('scrolltocarrier').style.display = 'block';
@@ -489,21 +490,27 @@ function plotModulatedSignalReal() {
     const m_filtered3_imag = m_filtered1.map((val, idx) => Math.sin(val) * carrier_sin[idx]);
 
 
-        // Plot the Baseband Phase
-        Plotly.newPlot('phasePlot', [
-        { 
-            x: Array.from({ length: m_filtered1.length }, (_, i) => i * SamplePeriod), // Time vector
-            y: m_filtered1,  // This is the baseband phase
-            type: 'scatter', 
-            mode: 'lines', 
-            name: 'Baseband Phase'
-        }
-    ], 
+    Plotly.newPlot('phasePlot', [
     { 
-        title: 'Baseband Phase of GMSK', 
-        xaxis: { title: 'Time (Seconds)' }, 
-        yaxis: { title: 'Phase (radians)' } 
-    });
+        x: Array.from({ length: m_filtered1.length }, (_, i) => i * SamplePeriod), // Time vector
+        y: m_filtered1,  // Baseband phase
+        type: 'scatter', 
+        mode: 'lines', 
+        name: 'Baseband Phase'
+    },
+    { 
+        x: t_rect,  // Time vector for rect_step
+        y: rect_step,  // Rectangular step signal
+        type: 'scatter', 
+        mode: 'lines', 
+        name: 'Mesaage Signal'
+    }
+], 
+{ 
+    title: 'Baseband Phase of GMSK',
+    xaxis: { title: 'Time (Seconds)' },
+    yaxis: { title: 'Phase (radians)' }
+});
 
     // Plot the GMSK modulated signal (Real Part)
     Plotly.newPlot('modulated-signalReal', [
