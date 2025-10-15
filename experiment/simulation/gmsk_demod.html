@@ -556,8 +556,18 @@ plotModulatedSignalReal();
     // Plot the demodulated signal as a binary signal
     const t_rx_digital = rx_digital.flatMap((val, idx) => [idx, idx + 1]);
     const rx_digital_step = rx_digital.flatMap((val) => [val, val]);
+
+    const annotations = rx_digital.slice(0, numBits).map((bit, index) => ({
+        x: index + (Tb / 2), // Place annotation at the time of each bit in the downsampled signal
+        y: 1.5, // Position the annotation at y = 1.5
+        text: bit.toString(), // Bit value (0 or 1) as text
+        showarrow: false, // No arrow for annotations
+        font: { color: "black", size: 14 } // Annotation text style
+    }));
+
+
     Plotly.newPlot('demodulated-signal', [{ x: t_rx_digital, y: rx_digital_step, type: 'scatter', mode: 'lines' }],
-      { title: 'Demodulated Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
+      { title: 'Demodulated Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' }, annotations: annotations });
     			//document.getElementById('scrolltocarrier').style.display = 'block';
 			            document.getElementById('scrolltodemodulated').scrollIntoView({ behavior: 'smooth' });
 	}
@@ -614,9 +624,9 @@ Plotly.newPlot('GMSKInput', [
         y: m_filtered3_real, 
         type: 'scatter', 
         mode: 'lines', 
-        name: 'In-phase' 
+        name: 'Modulated Signal' 
     },
-    { x: t_rect, y: rect_step, type: 'scatter', mode: 'lines' }
+    { x: t_rect, y: rect_step, type: 'scatter', mode: 'lines', name: 'Message Signal' }
 ], 
 { 
     title: 'GMSK Modulated Signal (Real Part)', 

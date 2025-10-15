@@ -48,8 +48,10 @@
         <li class="step step1"><strong>Step 1:</strong> Click on 'Generate Message' button to generate input message signal</li>
 		<li class="step step2"><strong>Step 2:</strong> Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
         <li class="step step3"><strong>Step 3:</strong> Click on 'Generate Carrier' button to generate carrier signal</li>
-        <li class="step step1"><strong>Step 4:</strong> Click on 'Generate MSK Signal' button to generate Minimum Shift Keying Signal</li>
-        <li class="step step1"><strong>Step 5:</strong> Click on 'Show Frequency Spectrum' button to view the spectrum of MSK</li>
+        <li class="step step1"><strong>Step 4:</strong> Click on 'Evaluate Baseband Phase' to view the baseband phase for MSK</li>
+        
+        <li class="step step1"><strong>Step 5:</strong> Click on 'Generate MSK Signal' button to generate Minimum Shift Keying Signal</li>
+        <li class="step step1"><strong>Step 6:</strong> Click on 'Show Frequency Spectrum' button to view the spectrum of MSK</li>
 
         <li class="step step2">In MSK, the frequency shift is half the baud rate. MSK represents the "1" bit with a frequency slightly higher 
 		than the carrier, fc + (baud rate)/4 and the "0" bit with a frequency slightly lower 
@@ -122,33 +124,39 @@
 					style= "height:250px; width: 550px; margin-left: 40px"
                   />
 				<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[610px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[750px] left-[2px]"
                   onclick="updateBitstream()"
                 >
                   Generate Message
                 </button>
 				<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[645px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[785px] left-[2px]"
                   onclick="plotNRZGraphs(result)"
                 >
                   Generate NRZ<br/>Signal
                 </button>
 								<button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[860px] left-[2px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[960px] left-[2px]"
                   onclick="generateCarrierSignal()"
                 >
                   Generate Carrier
                 </button>
 				
+                <button
+                class="button bg-blue-500 text-white rounded-md px-2 py-1 relative bottom-[100px] left-[400px]"
+                onclick="basebandPhase(bitstreamArray, fc, baudRate, Fs)"
+              >
+              Evaluate Baseband Phase
+              </button>
 			    <button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 relative bottom-[100px] left-[400px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 relative bottom-[50px] left-[200px]"
                   onclick="plotModulated()"
                 >
                   Generate MSK Signal
                 </button>
 
                 <button
-                class="button bg-gray-500 text-white rounded-md px-2 py-1 relative bottom-[-30px] left-[-25px]"
+                class="button bg-gray-500 text-white rounded-md px-2 py-1 relative bottom-[-30px] left-[-200px]"
                 onclick="spectrum()"
               >
                 Show Frequency Spectrum
@@ -416,12 +424,20 @@
     // Represent the digital signal from the bitstream
     const digitalSignal = representDigitalSignal(result.bitstream);
 
+    const annotations = bitstreamArray.slice(0, num_bits).map((bit, index) => ({
+        x: (index + 0.5) * (1 / baudRateformessage), // Midpoint of each bit duration, adjust with (1 / baudRate)
+        y: 1.1, // Position slightly above the signal (adjust based on bit value)
+        text: bit.toString(), // Display the bit value (0 or 1)
+        showarrow: false, // No arrow pointing to the annotation
+        font: { color: "black", size: 14 } // Font style for the annotation
+    }));
+
     digitalTrace = {
         x: digitalSignal.tx,  // Digital time values
         y: digitalSignal.bitx.flat(),  // Flatten the array of binary bits
         type: 'scatter',
         mode: 'lines',
-        name: 'Digital Signal',
+        name: 'Message Signal',
         line: {
             shape: 'hv' // Step-like horizontal-vertical (HV) lines for digital signals
         }
@@ -435,7 +451,8 @@
         yaxis: {
             title: 'Bit Value',
             range: [-0.1, 1.1] // Limit y-axis range to fit binary values
-        }
+        },
+        annotations: annotations
     };
 
     let digitalData = [digitalTrace];
@@ -492,7 +509,7 @@ function representDigitalSignal(bitsx) {
             Plotly.newPlot('mskModulatedPlot', mskModulatedData, mskModulatedLayout);
 		    document.getElementById('scrolltomodulated').scrollIntoView({ behavior: 'smooth' });
 
-        basebandPhase(bitstreamArray, fc, baudRate, Fs);
+        
         saveData(); 
             }
 			
@@ -694,7 +711,7 @@ function spectrum() {
   document.getElementById('scrolltospectrum').scrollIntoView({ behavior: 'smooth' });
 }
 
-
+let trace;
 function basebandPhase(bitstream, fc, baud, Fs) {
     // Convert bitstream to -1s and 1s
     let Dk = bitstream.map(bit => 2 * bit - 1);
@@ -725,7 +742,7 @@ function basebandPhase(bitstream, fc, baud, Fs) {
     }
 
     // Plot baseband phase
-    let trace = {
+    trace = {
         x: t,
         y: phi,
         type: 'scatter',
@@ -739,7 +756,7 @@ function basebandPhase(bitstream, fc, baud, Fs) {
     };
 
     digitalLayout = {
-  showlegend: false, // for example, hide the legend for the second trace
+  showlegend: true, // for example, hide the legend for the second trace
 };
 
 const combinedLayout = {

@@ -51,7 +51,9 @@
           <li class="step step1"><strong>Step 1:</strong> Click on 'Generate Message' button to generate input message signal</li>
           <li class="step step2"><strong>Step 2:</strong> Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
           <li class="step step3"><strong>Step 3:</strong> Click on 'Generate Carrier' button to generate carrier signal</li>
-          <li class="step step1"><strong>Step 4:</strong> Click on 'Generate MSK Signal' button to generate Minimum Shift Keying Signal</li>
+          <li class="step step1"><strong>Step 4:</strong> Click on 'Evaluate Baseband Phase' to view the baseband phase for MSK</li>
+
+          <li class="step step1"><strong>Step 5:</strong> Click on 'Generate MSK Signal' button to generate Minimum Shift Keying Signal</li>
           <li class="step step2">
             In MSK, the frequency shift is half the baud rate. MSK represents the "1" bit with a frequency slightly higher 
             than the carrier, fc + (baud rate)/4 and the "0" bit with a frequency slightly lower 
@@ -472,12 +474,17 @@ generateCarrierSignal();
 plotModulated();
     // Get the baud rate and compute scaling factor for time
     let k1 = 10000 / baudRateformessage; // Replace with your desired constant
-
+console.log("baudRateformessage", baudRateformessage);
     // Multiply each x value by the constant and truncate time to match the length of demodulated bitstream
     let scaledTime1 = result.time.slice(0, result.demodulatedBitstream.length).map(t => t * k1);
 
     // Represent the digital signal from the demodulated bitstream
     const digitalDemodulatedSignal = representDigitalSignal(result.demodulatedBitstream);
+    const downsampleFactor = 10000;
+const downsampledBitx = digitalDemodulatedSignal.bitx.filter((bit, index) => index % downsampleFactor === 0);
+
+console.log("a", downsampledBitx); 
+
 
     let digitalDemodulatedTrace = {
         x: digitalDemodulatedSignal.tx,  // Digital time values for demodulated signal
@@ -490,6 +497,15 @@ plotModulated();
         }
     };
 
+
+    const annotations = downsampledBitx.slice(0, downsampledBitx.length).map((bit, index) => ({
+        x: index*1/downsampledBitx.length, // Midpoint of each bit duration, adjust with (1 / baudRate)
+        y: 1.1, // Position slightly above the signal (adjust based on bit value)
+        text: bit.toString(), // Display the bit value (0 or 1)
+        showarrow: false, // No arrow pointing to the annotation
+        font: { color: "black", size: 14 } // Font style for the annotation
+    }));
+  
     let digitalDemodulatedLayout = {
         title: 'Demodulated Signal',
         xaxis: {
@@ -498,7 +514,8 @@ plotModulated();
         yaxis: {
             title: 'Bit Value',
             range: [-0.1, 1.1] // Limit y-axis range to fit binary values
-        }
+        },
+       annotations: annotations
     };
 
     let digitalDemodulatedData = [digitalDemodulatedTrace];
