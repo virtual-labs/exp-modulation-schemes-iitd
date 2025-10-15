@@ -50,8 +50,10 @@
 		<li class="step step2"><strong>Step 2:</strong> Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
 		<li class="step step3"><strong>Step 3:</strong> Then click on 'Generate Filtered Signal' button to generate gaussian filtered signal</li>
         <li class="step step4"><strong>Step 4:</strong> Click on 'Generate Carrier' button to generate carrier signal</li>
-        <li class="step step2"><strong>Step 5:</strong> Click on 'Generate GMSK Signal' button to generate Gaussian Minimum Shift Keying Signal</li>
-        <li class="step step1"><strong>Step 6:</strong> Click on 'Show Frequency Spectrum' button to view the spectrum of GMSK</li>
+        <li class="step step1"><strong>Step 5:</strong> Click on 'Evaluate Baseband Phase' to view the baseband phase for GMSK</li>
+        
+        <li class="step step2"><strong>Step 6:</strong> Click on 'Generate GMSK Signal' button to generate Gaussian Minimum Shift Keying Signal</li>
+        <li class="step step1"><strong>Step 7:</strong> Click on 'Show Frequency Spectrum' button to view the spectrum of GMSK</li>
         <li class="step step3">In GMSK, The filtered NRZ signal (which is now smoothed by the Gaussian filter)
 		is integrated over time to produce a phase signal. This is the key step that ensures 
 		continuous phase transitions, which is the hallmark of GMSK. <br/>&nbsp&nbsp&nbsp&nbsp&nbsp The integration ensures that the phase of the carrier changes
@@ -155,16 +157,21 @@
                 >
                   Generate Carrier
                 </button>
-				
+                <button
+                class="button bg-blue-500 text-white rounded-md px-2 py-1 relative bottom-[5px] left-[470px]"
+                onclick="basebandPhase()"
+              >
+                Evaluate Baseband Phase
+              </button>		
 			    <button
-                  class="button bg-blue-500 text-white rounded-md px-2 py-1 relative bottom-[5px] left-[470px]"
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 relative top-[35px] left-[270px]"
                   onclick="plotModulatedSignalReal()"
                 >
                   Generate GMSK Signal
                 </button>
 
                 <button
-                class="button bg-gray-500 text-white rounded-md px-2 py-1 relative bottom-[-70px] left-[-12px]"
+                class="button bg-gray-500 text-white rounded-md px-2 py-1 relative bottom-[-100px] left-[-160px]"
                 onclick="spectrum()"
               >
                 Show Frequency Spectrum
@@ -420,8 +427,19 @@ let rect_step = [];
     // Plot the message signal as a binary signal
     t_rect = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
     rect_step = rect.flatMap((val) => [val, val]);
+
+    const annotations = m.slice(0, numBits).map((bit, index) => ({
+        x: index + (Tb / 2), // Midpoint of each bit duration
+        y: 1.5, // Position slightly above the signal (adjust based on bit value)
+        text: bit.toString(), // Display the bit value (0 or 1)
+        showarrow: false, // No arrow pointing to the annotation
+        font: { color: "black", size: 14 } // Font style for the annotation
+    }));
+
+
+
     Plotly.newPlot('message-signal', [{ x: t_rect, y: rect_step, type: 'scatter', mode: 'lines' }],
-      { title: 'Message Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
+      { title: 'Message Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' }, annotations: annotations });
     			//document.getElementById('scrolltocarrier').style.display = 'block';
 			            document.getElementById('scrolltomessage').scrollIntoView({ behavior: 'smooth' });
 	}
@@ -467,6 +485,52 @@ Plotly.newPlot('filtered-signal', [{
 }
 
 let m_filtered3_real;
+function basebandPhase(){
+  const carrierFreq = parseInt(document.getElementById('carrierFreq').value);
+
+
+// Integrate the filtered data
+const m_filtered1 = math.cumsum(m_filtered);
+
+// Generate the GMSK modulated signal
+m_filtered2_real = m_filtered1.map(val => Math.cos(val));
+m_filtered2_imag = m_filtered1.map(val => Math.sin(val));
+const m_filtered2 = m_filtered2_real.map((val, idx) => math.complex(val, m_filtered2_imag[idx]));
+
+// Generate carrier signal
+const t1 = Array.from({ length: Math.ceil(m_filtered1.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
+const carrier_cos = t1.map((t) => Math.cos(2 * Math.PI * carrierFreq * t));
+const carrier_sin = t1.map((t) => Math.sin(2 * Math.PI * carrierFreq * t));
+
+// Generate the GMSK modulated signal with carrier
+ m_filtered3_real = m_filtered1.map((val, idx) => Math.cos(val) * carrier_cos[idx]);
+const m_filtered3_imag = m_filtered1.map((val, idx) => Math.sin(val) * carrier_sin[idx]);
+
+
+Plotly.newPlot('phasePlot', [
+{ 
+    x: Array.from({ length: m_filtered1.length }, (_, i) => i * SamplePeriod), // Time vector
+    y: m_filtered1,  // Baseband phase
+    type: 'scatter', 
+    mode: 'lines', 
+    name: 'Baseband Phase'
+},
+{ 
+    x: t_rect,  // Time vector for rect_step
+    y: rect_step,  // Rectangular step signal
+    type: 'scatter', 
+    mode: 'lines', 
+    name: 'Mesaage Signal'
+}
+], 
+{ 
+title: 'Baseband Phase of GMSK',
+xaxis: { title: 'Time (Seconds)' },
+yaxis: { title: 'Phase (radians)' }
+});
+}
+
+
 function plotModulatedSignalReal() {
     // Initialize parameters
     const carrierFreq = parseInt(document.getElementById('carrierFreq').value);
@@ -489,7 +553,7 @@ function plotModulatedSignalReal() {
      m_filtered3_real = m_filtered1.map((val, idx) => Math.cos(val) * carrier_cos[idx]);
     const m_filtered3_imag = m_filtered1.map((val, idx) => Math.sin(val) * carrier_sin[idx]);
 
-
+/*
     Plotly.newPlot('phasePlot', [
     { 
         x: Array.from({ length: m_filtered1.length }, (_, i) => i * SamplePeriod), // Time vector
@@ -511,7 +575,7 @@ function plotModulatedSignalReal() {
     xaxis: { title: 'Time (Seconds)' },
     yaxis: { title: 'Phase (radians)' }
 });
-
+*/
     // Plot the GMSK modulated signal (Real Part)
     Plotly.newPlot('modulated-signalReal', [
         { 
