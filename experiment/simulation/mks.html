@@ -83,7 +83,7 @@
                   class="border border-black px-2 py-1 rounded-sm"
                   type="number"
                   id="carrierFrequencyInput"
-                  value="10"
+                  value="5"
                 />
               </div>
               <div class="flex items-center justify-center gap-1 mt-2">
@@ -307,36 +307,44 @@
 	let num_bits = 10;
 
 		
-        function modulateMSK(bitstream, fc, baud, Fs) {
-            // Convert bitstream to -1s and 1s
-            let Dk = bitstream.map(bit => 2 * bit - 1);
-            Dk.unshift(-1); // Add initial value for Dk
+function modulateMSK(bitstream, fc, baud, Fs) {
+    const T = 1 / baud;                  // Symbol duration
+    const N = bitstream.length;
+    const samplesPerSymbol = Math.floor(Fs * T);
+    const totalSamples = N * samplesPerSymbol;
+    const dt = 1 / Fs;
 
-            let N = bitstream.length;
-            let T = 1 / baud;
-            let t = [];
-            for (let i = 0; i < N * T * Fs; i++) {
-                t.push(i / Fs);
-            }
+    // Time vector
+    let t = Array.from({ length: totalSamples }, (_, i) => i * dt);
 
-            // Calculate Phase Constraint Vector, Xk
-            let Xk = [0];
-            for (let k = 1; k <= N; k++) {
-                Xk[k] = (Xk[k - 1] + ((Math.PI * k) / 2) * (Dk[k - 1] - Dk[k])) % (2 * Math.PI);
-            }
-            Xk.shift();
+    // Map bits {0,1} to {-1,+1}
+    let Dk = bitstream.map(b => 2 * b - 1);
 
-            // Generate MSK Waveform
-            let s = [];
-            for (let i = 0; i < t.length; i++) {
-                let symbolIndex = Math.floor(t[i] / T);
-                let Dk_value = Dk[symbolIndex + 1];
-                let Xk_value = Xk[symbolIndex];
-                s.push(Math.cos(2 * Math.PI * (fc + Dk_value / (4 * T)) * t[i] + Xk_value));
-            }
+    // Compute phase trajectory to ensure continuity
+    let phase = new Array(totalSamples).fill(0);
+    let currentPhase = 0;
 
-            return [s, t];
+    for (let k = 0; k < N; k++) {
+        const bit = Dk[k];
+        const freqShift = bit / (4 * T);  // ±1/(4T) shift
+        const omega = 2 * Math.PI * (fc + freqShift);
+
+        for (let n = 0; n < samplesPerSymbol; n++) {
+            const i = k * samplesPerSymbol + n;
+            const time = n * dt;
+            phase[i] = currentPhase + omega * time;
         }
+
+        // Update current phase for the next symbol (continuous)
+        currentPhase = phase[(k + 1) * samplesPerSymbol - 1];
+    }
+
+    // Generate modulated MSK signal: s(t) = cos(phase)
+    let s = phase.map(phi => Math.cos(phi));
+
+    return [s, t];
+}
+
 
 
 
@@ -712,36 +720,40 @@ function spectrum() {
 }
 
 let trace;
+
 function basebandPhase(bitstream, fc, baud, Fs) {
-    // Convert bitstream to -1s and 1s
-    let Dk = bitstream.map(bit => 2 * bit - 1);
-    Dk.unshift(-1); // Add initial value for Dk
+    const T = 1 / baud;                  // Symbol duration
+    const N = bitstream.length;
+    const samplesPerSymbol = Math.floor(Fs * T);
+    const totalSamples = N * samplesPerSymbol;
+    const dt = 1 / Fs;
 
-    let N = bitstream.length;
-    let T = 1 / baud;
-    let t = [];
-    for (let i = 0; i < N * T * Fs; i++) {
-        t.push(i / Fs);
+    // Time vector
+    let t = Array.from({ length: totalSamples }, (_, i) => i * dt);
+
+    // Map bits {0,1} to {-1,+1}
+    let Dk = bitstream.map(b => 2 * b - 1);
+
+    // ✅ Compute smooth, continuous baseband phase
+    let phi = new Array(totalSamples).fill(0);
+    let currentPhase = 0;
+
+    for (let k = 0; k < N; k++) {
+        const bit = Dk[k];
+        const freqShift = bit / (4 * T); // ±1/(4T)
+        const omega = 2 * Math.PI * freqShift;
+
+        for (let n = 0; n < samplesPerSymbol; n++) {
+            const i = k * samplesPerSymbol + n;
+            const time = n * dt;
+            phi[i] = currentPhase + omega * time; // phase accumulates smoothly
+        }
+
+        // Update phase at the end of this symbol for continuity
+        currentPhase = phi[(k + 1) * samplesPerSymbol - 1];
     }
 
-    // Calculate Phase Constraint Vector, Xk
-    let Xk = [0];
-    for (let k = 1; k <= N; k++) {
-        Xk[k] = (Xk[k - 1] + ((Math.PI * k) / 2) * (Dk[k - 1] - Dk[k])) % (2 * Math.PI);
-    }
-    Xk.shift();
-
-    // Generate MSK Baseband Phase
-    let phi = [];
-    for (let i = 0; i < t.length; i++) {
-        let symbolIndex = Math.floor(t[i] / T);
-        let Dk_value = Dk[symbolIndex + 1];
-        let Xk_value = Xk[symbolIndex];
-        // Baseband phase
-        phi.push((Math.PI / (2 * T)) * Dk_value * (t[i] - symbolIndex*T) + Xk_value);
-    }
-
-    // Plot baseband phase
+    // ✅ Plot baseband phase
     trace = {
         x: t,
         y: phi,
@@ -749,6 +761,7 @@ function basebandPhase(bitstream, fc, baud, Fs) {
         mode: 'lines',
         name: 'Baseband Phase'
     };
+
     let layout = {
         title: "MSK Baseband Phase Evolution",
         xaxis: { title: "Time (s)" },
@@ -756,19 +769,20 @@ function basebandPhase(bitstream, fc, baud, Fs) {
     };
 
     digitalLayout = {
-  showlegend: true, // for example, hide the legend for the second trace
-};
+        showlegend: true,
+    };
 
-const combinedLayout = {
-  ...layout,       // Use all properties of layout
-  ...digitalLayout // Merge digitalLayout properties (digital settings override general settings)
-};
+    const combinedLayout = {
+        ...layout,
+        ...digitalLayout
+    };
 
     Plotly.newPlot("phasePlot", [trace, digitalTrace], combinedLayout);
-    //Plotly.newPlot('digitalPlot', digitalData, digitalLayout);
 
     return [phi, t];
 }
+
+
 
 
 
