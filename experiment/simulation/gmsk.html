@@ -486,11 +486,26 @@ Plotly.newPlot('filtered-signal', [{
 
 let m_filtered3_real;
 function basebandPhase(){
+/////////////////////////
+
+const gaussfilterpp = GMSK_gaussian_filter1(Tb, 2);
+    
+    // Pass message signal through Gaussian LPF
+    const m_filtered0pp = convolve(rect, gaussfilterpp).concat(rect.slice(-1));
+    const max_valpp = Math.max(...m_filtered0pp);
+const min_valpp = Math.min(...m_filtered0pp);
+
+// Normalize the signal to [-1, 1]
+const m_filteredpp = m_filtered0pp.map(val => {
+  return 2 * (val - min_valpp) / (max_valpp - min_valpp) - 1});
+
+///////////////////////
   const carrierFreq = parseInt(document.getElementById('carrierFreq').value);
 
 
 // Integrate the filtered data
-const m_filtered1 = math.cumsum(m_filtered);
+//m_filtered0 = m_filtered.map((val, idx) => idx === 0 ? 0 : m_filtered[idx - 1] + val);
+const m_filtered1 = math.cumsum(m_filteredpp);
 
 // Generate the GMSK modulated signal
 m_filtered2_real = m_filtered1.map(val => Math.cos(val));
@@ -506,11 +521,12 @@ const carrier_sin = t1.map((t) => Math.sin(2 * Math.PI * carrierFreq * t));
  m_filtered3_real = m_filtered1.map((val, idx) => Math.cos(val) * carrier_cos[idx]);
 const m_filtered3_imag = m_filtered1.map((val, idx) => Math.sin(val) * carrier_sin[idx]);
 
+const lengthToUse = Math.min(m_filtered1.length, t_rect.length);
 
 Plotly.newPlot('phasePlot', [
 { 
-    x: Array.from({ length: m_filtered1.length }, (_, i) => i * SamplePeriod), // Time vector
-    y: m_filtered1,  // Baseband phase
+    x: Array.from({ length: m_filtered1.length }, (_, i) => i * SamplePeriod).slice(0, lengthToUse), // Time vector
+    y: m_filtered1.map(val => val / 4).slice(0, lengthToUse),  // Baseband phase
     type: 'scatter', 
     mode: 'lines', 
     name: 'Baseband Phase'
