@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdn.jsdelivr.net/npm/mathjs@10.5.2/lib/browser/math.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Virtual Labs</title>
+    <style>
+	    .container {
+            display: flex;
+			    height: 100vh; /* Full viewport height */
+        width: 100vw; /* Full viewport width */
+        }
+		.left-half {
+            width: 50vw;
+			}
+
+        .right-half {
+            width: 50vw;
+		    position: relative;
+		    overflow: auto;
+        }
+      table {
+        width: 80%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- sidebar and body -->
+	    <!-- sidebar and body -->
+  <div id = "modulation">
+
+    <div id="instructions">
+      <h1>Instructions for Gaussian Minimum Shift Keying Modulation (GMSK)</h1>
+      <ul>
+        <li class="step step4"><strong>Note:</strong> Use the input fields to enter the number of bits, carrier frequency (Hz), Time-Bandwidth Product (BT), and the baud rate (Hz)</li>
+    
+        <li class="step step1"><strong>Step 1:</strong> Click on 'Generate Message' button to generate input message signal</li>
+        <li class="step step2"><strong>Step 2:</strong> Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
+        <li class="step step3"><strong>Step 3:</strong> Then click on 'Generate Filtered Signal' button to generate Gaussian filtered signal</li>
+        <li class="step step4"><strong>Step 4:</strong> Click on 'Generate Carrier' button to generate carrier signal</li>
+        <li class="step step5"><strong>Step 5:</strong> Click on 'Generate GMSK Signal' button to generate Gaussian Minimum Shift Keying Signal</li>
+        <li class="step step6">In GMSK, the filtered NRZ signal (which is now smoothed by the Gaussian filter)
+          is integrated over time to produce a phase signal. This is the key step that ensures 
+          continuous phase transitions, which is the hallmark of GMSK. <br/> The integration ensures that the phase of the carrier changes
+          gradually, avoiding abrupt phase transitions and maintaining phase continuity.</li>
+      </ul>
+    </div>
+    
+    <hr/>
+    <br/>
+    
+    <div class="flex min-h-[10vh]">
+      <div class="px-6 pb-6 mt-1 flex-1">
+        <div class="flex flex-col justify-center">
+          <div class="flex max-lg:flex-col gap-x-12 gap-y-2 mt-2">
+            <div class="flex items-center justify-center gap-1">
+              <label for="numBits">Number of Bits:</label>
+              <input
+                class="max-lg:ml-10 border border-black px-2 py-1 rounded-sm"
+                type="number"
+                id="numBits"  
+                value="10"
+              />
+            </div>
+            <div class="flex items-center justify-center gap-1 mt-2">
+              <label for="carrierFreq">Carrier Frequency (Hz):</label>
+              <input
+                class="border border-black px-2 py-1 rounded-sm"
+                type="number"
+                id="carrierFreq"
+                value="100"
+              />
+            </div>
+            <div class="flex items-center justify-center gap-1 mt-2">
+              <label for="timeBandwidth">Time-Bandwidth Product (BT):</label>
+              <input
+                class="border border-black px-2 py-1 rounded-sm"
+                type="number"
+                id="timeBandwidth"
+                value="0.3"
+              />
+            </div>
+            <div class="flex items-center justify-center gap-1 mt-2">
+              <label for="baudRateInput">Baud Rate (Hz):</label>
+              <input
+                class="border border-black px-2 py-1 rounded-sm"
+                type="number"
+                id="baudRateInput"
+                value="1"
+                readonly
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <hr/>
+    
+    <div class="container">
+      <div class="left-half relative">
+        <div class="flex gap-1">
+          <div class="flex-1 flex flex-col items-center">
+            <div class="w-full">
+              <br/>
+              <img
+                src="gmsk_mod.png"
+                alt="gmsk modulation" 
+                style="height:300px; width:650px; margin-left:40px"
+              />
+              <button
+                class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[45px] left-[2px]"
+                onclick="plotMessageSignal()"
+              >
+                Generate Message
+              </button>
+              <button
+                class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[85px] left-[2px]"
+                onclick="generateAndPlot()"
+              >
+                Generate NRZ Signal
+              </button>
+              <button
+                class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[240px] left-[2px]"
+                onclick="plotFilteredSignal()"
+              >
+                Generate Filtered<br/>Signal
+              </button>
+              <button
+                class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[310px] left-[2px]"
+                onclick="generateCarrierSignal()"
+              >
+                Generate Carrier
+              </button>
+              <button
+                class="button bg-blue-500 text-white rounded-md px-2 py-1 relative bottom-[5px] left-[470px]"
+                onclick="plotModulatedSignalReal()"
+              >
+                Generate GMSK Signal
+              </button>
+    
+              <!--
+              <button
+                class="button bg-gray-500 text-white rounded-md px-2 py-1 relative top-[100px] right-[0px]"
+                onclick="plotDemodulatedSignal()"
+              >
+                Perform Demodulation
+              </button>
+              -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+
+
+
+				
+	<div class = "right-half">
+	            <div id = "scrolltomessage" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="message-signal" class="w-[600px] h-[450px]"></div>
+			</div>
+				            <div id = "scrolltonrz" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="nrz-signal" class="w-[600px] h-[450px]"></div>
+			</div>
+		    <div id = "scrolltofilteredsignal" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="filtered-signal" class="w-[600px] h-[450px]"></div>
+			</div>
+			<div id = "scrolltocarrier" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="carrier-plot" class="w-[600px] h-[450px]"></div>
+			</div>
+			<div id = "scrolltomodulatedReal" class="flex items-center gap-2 justify-center max-lg:flex-col">
+                <div id="modulated-signalReal" class="w-[600px] h-[450px]"></div>
+              </div>
+			  			<div class="flex items-center gap-2 justify-center max-lg:flex-col">
+                <div id="modulated-signalImag" class="w-[600px] h-[450px]"></div>
+              </div>
+	</div>
+	</div>
+	
+	
+</div>
+
+</div>
+
+	    <!-- sidebar and body -->
+			  <div id = "container">
+    <h1>Instructions for Gaussian Minimum Shift Keying (GMSK) Demodulation</h1>
+    <ul>
+		<li class="step step1">Step 1: You can Demodulate the GMSK Signal clicking on the 'Demodulate GMSK' button</li>
+		<li class="step step2">In GMSK demodulation, the low-pass filter (LPF) removes high-frequency noise, isolating the baseband signal. The phase estimator extracts the signal's phase, which carries the encoded data. The deviator converts phase changes into 
+		<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp frequency deviations to retrieve the transmitted data, and the decision circuit interprets these deviations, converting them into binary data (0s and 1s) based on set thresholds.</li>
+    </ul>
+</div>
+    <div class="flex min-h-[80vh]">
+      <div class="px-6 pb-6 flex-1">
+        <!--  -->
+        <div class="flex">
+          <div class="flex-1 basis-4/5 flex flex-col">
+            <div class="flex max-lg:flex-col mt-5 items-center gap-x-8 gap-y-2">
+
+
+            </div>
+            <div class="flex max-lg:flex-col mt-5 items-center gap-x-8 gap-y-2">
+ 
+
+            </div>
+          </div>
+
+        </div>
+        <div class="mt-4 border-t-2">
+          <div class="flex flex-col">
+            <!-- Buttons with gap -->
+            <div class="flex justify-center pt-4 gap-2">
+              <button
+                onclick="GMSKInput();"
+                class="bg-blue-500 text-white rounded-md px-3 py-1"
+              >
+                GMSK Input
+              </button>
+              <button
+                onclick="plotDemodulatedSignal()"
+                class="bg-blue-500 text-white rounded-md px-2 py-1"
+              >
+                Demodulate GMSK
+              </button>
+              <a href="../bervssnr/GMSK_BerVsSnr.html" target = "_blank">
+                <button
+                class="bg-green-500 text-white rounded-md px-3 py-1"
+                class="button"
+              >
+                Plot BER vs. SNR
+              </button>
+              </a>
+            </div>
+        
+            <div class="flex gap-1">
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full">
+                  <img
+                    class="w-[80%] h-[80%]"
+                    src="gmsk_demod.png"
+                    alt="gmsk demodulation"
+                  />
+                </div>
+              </div>
+              <div id="scrolltodemodulated" class="flex flex-col items-center gap-2 justify-center max-lg:flex-col">
+                <div id="GMSKInput" class="w-[600px] h-[450px]"></div>
+                <div id="demodulated-signal" class="w-[600px] h-[450px]"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!--  -->
+      </div>
+    </div>
+			<script>	
+		        function checkFrequencies() {
+            // Get values from input fields
+            let carrierFrequency = parseFloat(document.getElementById('carrierFreq').value);
+            let bit_rate = parseFloat(document.getElementById('baudRateInput').value);
+            console.log(carrierFrequency);
+			console.log(bit_rate);
+            // Check the frequencies
+            if (carrierFrequency <= bit_rate) {
+                alert("Carrier frequency should be much higher than Baud Rate.");
+		    window.location.reload(true); 
+            } else {
+                console.log("Carrier frequency should be much higher than Baud Rate.");
+            }
+        }
+
+        // Function to attach event listeners to all buttons
+        function attachEventListeners() {
+            let buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', checkFrequencies);
+            });
+        }
+		
+		        // Attach event listeners when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', attachEventListeners);
+		</script>
+		
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Function to check the BT value
+            function checkBT() {
+                const btValue = parseFloat(document.getElementById('timeBandwidth').value);
+                if (btValue < 0.3 || btValue > 0.5) {
+                    alert("Please enter a BT value between 0.3 and 0.5.");
+			window.location.reload(true); 
+                }
+            }
+
+            // Add event listener to all buttons on the page
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', checkBT);
+            });
+        });
+    </script>
+		
+    <script>
+	let numBits = 10;
+	let Tb = 1;
+	let samples = 36;
+	let rect = [];
+	let m_filtered = [];
+	let m_filtered2_real = [];
+	let m_filtered2_imag = [];
+	let m = [];
+	let SamplePeriod = 0;
+	let BT = parseFloat(document.getElementById('timeBandwidth').value);
+	let baudRate = parseInt(document.getElementById('baudRateInput').value);
+
+  let mm = [];
+let t1 = [];
+let t_rect = [];
+let rect_step = [];
+
+	console.log(baudRate);
+      // Helper function to generate linearly spaced arrays
+    function linspace(start, end, num) {
+      const step = (end - start) / (num - 1);
+      return Array.from({ length: num }, (_, i) => start + (i * step));
+    }
+    
+    // Custom convolution function
+    function convolve(arr1, arr2) {
+      const result = Array(arr1.length + arr2.length - 1).fill(0);
+      arr1.forEach((a, i) => {
+        arr2.forEach((b, j) => {
+          result[i + j] += a * b;
+        });
+      });
+      return result;
+    }
+    
+    // Custom unwrap function
+    function unwrap(phase) {
+      const unwrapped = [...phase];
+      for (let i = 1; i < phase.length; i++) {
+        let delta = unwrapped[i] - unwrapped[i - 1];
+        if (delta > Math.PI) {
+          unwrapped[i] -= 2 * Math.PI;
+        } else if (delta < -Math.PI) {
+          unwrapped[i] += 2 * Math.PI;
+        }
+      }
+      return unwrapped;
+    }
+    
+    function generateAndPlot() {
+    // Initialize parameters
+    Tb = 1; // bit duration
+    SamplePeriod = Tb * (1 / samples);
+    
+    // Generate random message bits
+    numBits = parseInt(document.getElementById('numBits').value);
+    mm = m.map(value => value * 2 - 1);
+    const t1 = Array.from({ length: Math.ceil(mm.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
+    
+    // Convert message into a series of unipolar NRZ data.
+    rect = mm.flatMap(bit => Array(samples).fill(bit));
+    
+    // Plot the message signal as a binary signal
+    t_rect = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
+    rect_step = rect.flatMap((val) => [val, val]);
+    Plotly.newPlot('nrz-signal', [{ x: t_rect, y: rect_step, type: 'scatter', mode: 'lines' }],
+      { title: 'NRZ Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
+    			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltonrz').scrollIntoView({ behavior: 'smooth' });
+	}
+	
+	function plotMessageSignal() {
+	    // Initialize parameters
+    Tb = 1; // bit duration
+    SamplePeriod = Tb * (1 / samples);
+    
+    // Generate random message bits
+    numBits = parseInt(document.getElementById('numBits').value);
+    m = Array.from({ length: numBits }, () => Math.random() < 0.5 ? 0 : 1);
+    const t1 = Array.from({ length: Math.ceil(m.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
+    
+    // Convert message into a series of unipolar NRZ data.
+    rect = m.flatMap(bit => Array(samples).fill(bit));
+    
+    // Plot the message signal as a binary signal
+    const t_rect = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
+    const rect_step = rect.flatMap((val) => [val, val]);
+    Plotly.newPlot('message-signal', [{ x: t_rect, y: rect_step, type: 'scatter', mode: 'lines' }],
+      { title: 'Message Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' } });
+    			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltomessage').scrollIntoView({ behavior: 'smooth' });
+	}
+	
+    // Create Gaussian low pass filter
+    function GMSK_gaussian_filter1(T, sps) {
+      const t = linspace(-1.5 * T, 1.5 * T, Math.ceil(3 * T * sps));
+      const h = t.map(t => BT * Math.sqrt(2 * Math.PI / Math.log(2)) * Math.exp(-2 * (Math.PI ** 2) * (BT ** 2) * (t ** 2) / Math.log(2)));
+      const K = Math.PI / 2 / math.sum(h);
+      let gfilter = h.map(val => K * val);
+      gfilter = math.divide(gfilter, Math.sqrt(math.sum(gfilter.map(val => val * val))));
+      return gfilter;
+    }
+    
+	function plotFilteredSignal() {
+    const gaussfilter = GMSK_gaussian_filter1(Tb, samples);
+    
+    // Pass message signal through Gaussian LPF
+    m_filtered = convolve(rect, gaussfilter).concat(rect.slice(-1));
+    
+// Plot the filtered signal
+Plotly.newPlot('filtered-signal', [{
+    x: math.range(0, m_filtered.length).toArray().map(i => i / samples), 
+    y: m_filtered, 
+    type: 'scatter', 
+    mode: 'lines'
+  }], 
+  { 
+    title: 'Filtered Signal', 
+    xaxis: { title: 'Time (Seconds)' }, // Updated label for clarity
+    yaxis: { title: 'Amplitude' }
+  }
+);
+			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltofilteredsignal').scrollIntoView({ behavior: 'smooth' });
+}
+
+function plotModulatedSignalReal() {
+    // Initialize parameters
+    const carrierFreq = parseInt(document.getElementById('carrierFreq').value);
+
+
+    // Integrate the filtered data
+    const m_filtered1 = math.cumsum(m_filtered);
+
+    // Generate the GMSK modulated signal
+    m_filtered2_real = m_filtered1.map(val => Math.cos(val));
+    m_filtered2_imag = m_filtered1.map(val => Math.sin(val));
+    const m_filtered2 = m_filtered2_real.map((val, idx) => math.complex(val, m_filtered2_imag[idx]));
+
+    // Generate carrier signal
+    const t1 = Array.from({ length: Math.ceil(m_filtered1.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
+    const carrier_cos = t1.map((t) => Math.cos(2 * Math.PI * carrierFreq * t));
+    const carrier_sin = t1.map((t) => Math.sin(2 * Math.PI * carrierFreq * t));
+
+    // Generate the GMSK modulated signal with carrier
+    const m_filtered3_real = m_filtered1.map((val, idx) => Math.cos(val) * carrier_cos[idx]);
+    const m_filtered3_imag = m_filtered1.map((val, idx) => Math.sin(val) * carrier_sin[idx]);
+
+    // Plot the GMSK modulated signal (Real Part)
+    Plotly.newPlot('modulated-signalReal', [
+        { 
+            x: Array.from({ length: m_filtered3_real.length }, (_, i) => i * SamplePeriod), // Time vector
+            y: m_filtered3_real, 
+            type: 'scatter', 
+            mode: 'lines', 
+            name: 'In-phase' 
+        }
+    ], 
+    { 
+        title: 'GMSK Modulated Signal (Real Part)', 
+        xaxis: { title: 'Time (Seconds)' }, 
+        yaxis: { title: 'Amplitude' } 
+    });
+
+    // Plot the GMSK modulated signal (Imaginary Part)
+    Plotly.newPlot('modulated-signalImag', [
+        { 
+            x: Array.from({ length: m_filtered3_imag.length }, (_, i) => i * SamplePeriod), // Time vector
+            y: m_filtered3_imag, 
+            type: 'scatter', 
+            mode: 'lines',
+            line: { color: 'orange' }, // Change line color to blue			
+            name: 'Quadrature' 
+        }
+    ], 
+    { 
+        title: 'GMSK Modulated Signal (Imaginary Part)', 
+        xaxis: { title: 'Time (Seconds)' }, 
+        yaxis: { title: 'Amplitude' } 
+    });
+
+    // Scroll to the modulated signal view (optional)
+    document.getElementById('scrolltomodulatedReal').scrollIntoView({ behavior: 'smooth' });
+}
+
+
+    function plotDemodulatedSignal() {
+      //plotMessageSignal();
+      generateAndPlot();
+plotFilteredSignal();
+generateCarrierSignal();
+plotModulatedSignalReal();
+    // No noise is introduced here. The signal remains as is.
+    const noisy_real = m_filtered2_real;
+    const noisy_imag = m_filtered2_imag;
+    
+    // Pass I and Q through Matched Filter
+    function GMSK_matched_filter(T, sps) {
+      const t = linspace(-1.5 * T, 1.5 * T, Math.ceil(3 * T * sps));
+      const h = t.map(t => BT * Math.sqrt(2 * Math.PI / Math.log(2)) * Math.exp(-2 * (Math.PI ** 2) * (BT ** 2) * (t ** 2) / Math.log(2)));
+      const K = Math.PI / 2 / math.sum(h);
+      let Mfil = h.map(val => K * val);
+      Mfil = math.divide(Mfil, Math.sqrt(math.sum(Mfil.map(val => val * val))));
+      return Mfil;
+    }
+    
+    const mfilt_samples = 7;
+    const matchfilter = GMSK_matched_filter(Tb, mfilt_samples);
+    
+    // Convolve the filter with the signal and add an extra sample to the end.
+    const filt_noisy_real = convolve(noisy_real, matchfilter).concat(noisy_real.slice(-1));
+    const filt_noisy_imag = convolve(noisy_imag, matchfilter).concat(noisy_imag.slice(-1));
+    
+    // Obtain the phase of the analog signal
+    const phase = filt_noisy_real.map((val, idx) => Math.atan2(filt_noisy_imag[idx], val));
+    const unwrapped_phase = unwrap(phase);
+    
+    // Obtain the derivative of the signal.
+    const derivative = unwrapped_phase.map((val, idx) => idx === 0 ? val : val - unwrapped_phase[idx - 1]);
+    
+    // Downsample the signal
+    function GMSK_downsample(start, end, sps, derivative) {
+      return derivative.filter((_, idx) => idx >= start && idx < derivative.length - end && (idx - start) % sps === 0);
+    }
+    
+    const rx_dwnsmpled = GMSK_downsample(70, 71, samples, derivative);
+    
+    // ADC Conversion
+    function GMSK_ADC(rx_down) {
+      return rx_down.map(val => val < 0 ? 0 : 1);
+    }
+    
+    const rx_digital = GMSK_ADC(rx_dwnsmpled);
+    
+    // Plot the demodulated signal as a binary signal
+    const t_rx_digital = rx_digital.flatMap((val, idx) => [idx, idx + 1]);
+    const rx_digital_step = rx_digital.flatMap((val) => [val, val]);
+
+    const annotations = rx_digital.slice(0, numBits).map((bit, index) => ({
+        x: index + (Tb / 2), // Place annotation at the time of each bit in the downsampled signal
+        y: 1.5, // Position the annotation at y = 1.5
+        text: bit.toString(), // Bit value (0 or 1) as text
+        showarrow: false, // No arrow for annotations
+        font: { color: "black", size: 14 } // Annotation text style
+    }));
+
+
+    Plotly.newPlot('demodulated-signal', [{ x: t_rx_digital, y: rx_digital_step, type: 'scatter', mode: 'lines' }],
+      { title: 'Demodulated Signal', xaxis: { title: 'Time (seconds)' }, yaxis: { title: 'Amplitude' }, annotations: annotations });
+    			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltodemodulated').scrollIntoView({ behavior: 'smooth' });
+	}
+	
+			function generateCarrierSignal() {
+            Fs = parseInt(document.getElementById("carrierFreq").value)*10;
+            fc = parseInt(document.getElementById("carrierFreq").value);
+            const t = Array.from({ length: 1 * Fs }, (_, i) => i / Fs);
+            const carrier_signal = t.map((time) => Math.sin(2 * Math.PI * fc * time));
+
+            const carrierData = [{
+                x: t,
+                y: carrier_signal,
+                type: "scatter",
+                mode: "lines",
+                name: "Carrier Signal",
+            }];
+
+            const carrierLayout = {
+                title: "Carrier Signal",
+                xaxis: { title: "Time (Seconds)" },
+                yaxis: { title: "Amplitude" },
+            };
+
+            Plotly.newPlot("carrier-plot", carrierData, carrierLayout);
+						// Scroll to the plot area
+
+			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltocarrier').scrollIntoView({ behavior: 'smooth' });
+        }
+
+function GMSKInput() {
+  //generateAndPlot();
+  /*
+  Tb = 1; // bit duration
+    SamplePeriod = Tb * (1 / samples);
+    
+    // Generate random message bits
+    numBits = parseInt(document.getElementById('numBits').value);
+    //mm = m.map(value => value * 2 - 1);
+    const t1 = Array.from({ length: Math.ceil(mm.length * Tb / SamplePeriod) }, (_, i) => i * SamplePeriod);
+    
+    // Convert message into a series of unipolar NRZ data.
+    rect = mm.flatMap(bit => Array(samples).fill(bit));
+    
+    // Plot the message signal as a binary signal
+    const t_rectpp = rect.flatMap((val, idx) => [t1[idx], t1[idx + 1] || t1[idx] + SamplePeriod]);
+    const rect_steppp = rect.flatMap((val) => [val, val]);
+*/
+// Plot the GMSK modulated signal (Real Part)
+Plotly.newPlot('GMSKInput', [
+    { 
+        x: Array.from({ length: m_filtered3_real.length }, (_, i) => i * SamplePeriod), // Time vector
+        y: m_filtered3_real, 
+        type: 'scatter', 
+        mode: 'lines', 
+        name: 'Modulated Signal' 
+    },
+    { x: t_rect, y: rect_step, type: 'scatter', mode: 'lines', name: 'Message Signal' }
+], 
+{ 
+    title: 'GMSK Modulated Signal (Real Part)', 
+    xaxis: { title: 'Time (Seconds)' }, 
+    yaxis: { title: 'Amplitude' } 
+});
+
+// Scroll to the modulated signal view (optional)
+document.getElementById('GMSKInput').scrollIntoView({ behavior: 'smooth' });
+}
+
+        function loadData() {
+  const myData = JSON.parse(localStorage.getItem("sharedData"));
+
+  if (myData) {
+    Tb = myData.Tb;
+    SamplePeriod = myData.SamplePeriod;
+    numBits = myData.numBits;
+    m = myData.m;
+    mm = myData.mm;
+    t1 = myData.t1;
+    rect = myData.rect;
+    t_rect = myData.t_rect;
+    rect_step = myData.rect_step;
+    m_filtered3_real = myData.m_filtered3_real;
+  }
+}
+
+// Load immediately
+loadData();
+
+// Update if storage changes (works across tabs)
+window.addEventListener('storage', loadData);
+    </script>	
+	<style>
+    #modulation {
+      display: none;
+    }
+#container {
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 25px 40px;
+  max-width: 100%;
+  margin: 20px auto;
+  text-align: left;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+h1 {
+  color: #1e3a8a;
+  font-size: 24px;
+  margin-bottom: 25px;
+  text-align: justify;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li.step {
+  margin: 12px 0;
+  padding: 12px 15px;
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+li.step::before {
+  content: "✔";
+  color: #10b981;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+li.step:hover {
+  transform: scale(1.02);
+  background-color: #f3f4f6;
+}
+
+/* Color code each step */
+.step1 {
+  background-color: #ffe0e0;
+  border-left: 5px solid #ef4444;
+}
+.step2 {
+  background-color: #e0f7ff;
+  border-left: 5px solid #0ea5e9;
+}
+.step3 {
+  background-color: #e0ffe5;
+  border-left: 5px solid #22c55e;
+}
+.step4 {
+  background-color: #f5e0ff;
+  border-left: 5px solid #a855f7;
+}
+	</style>
+  </body>
+</html>
