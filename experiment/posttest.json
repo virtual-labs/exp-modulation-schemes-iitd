@@ -16,7 +16,7 @@
         "d": "Incorrect. BT is a critical parameter controlling the ISI-bandwidth trade-off."
       },
       "correctAnswer": "b",
-      "difficulty": "hard"
+      "difficulty": "intermediate"
     },
     {
       "question": "2. In GMSK, how does the presence of memory due to Gaussian filtering affect maximum likelihood sequence estimation (MLSE)?",
@@ -33,7 +33,7 @@
         "d": "Incorrect. MLSE is precisely designed to handle memory effects in modulation schemes."
       },
       "correctAnswer": "c",
-      "difficulty": "hard"
+      "difficulty": "intermediate"
     },
     {
       "question": "3. Why is MSK considered a special case of continuous phase frequency shift keying (CPFSK)?",
@@ -50,7 +50,7 @@
         "d": "Incorrect. MSK uses a constant frequency deviation corresponding to a modulation index of 0.5."
       },
       "correctAnswer": "b",
-      "difficulty": "hard"
+      "difficulty": "intermediate"
     },
     {
       "question": "4. In the context of GMSK, which factor most directly determines the extent of inter-symbol interference (ISI)?",
@@ -67,7 +67,7 @@
         "d": "Incorrect. CNR affects noise performance, not ISI caused by filtering."
       },
       "correctAnswer": "b",
-      "difficulty": "hard"
+      "difficulty": "intermediate"
     },
     {
       "question": "5. How does the minimum frequency spacing in MSK ensure orthogonality between symbols?",
@@ -84,7 +84,7 @@
         "d": "Incorrect. Gaussian filtering is relevant in GMSK, not MSK orthogonality."
       },
       "correctAnswer": "b",
-      "difficulty": "hard"
+      "difficulty": "intermediate"
     },
     {
       "question": "6. Why is non-coherent detection more challenging in GMSK compared to MSK?",
@@ -101,7 +101,7 @@
         "d": "Incorrect. Both MSK and GMSK may use IQ demodulation but that’s not the challenge here."
       },
       "correctAnswer": "b",
-      "difficulty": "hard"
+      "difficulty": "intermediate"
     },
     {
       "question": "7. How does continuous phase modulation in MSK help in reducing spectral side lobes?",
@@ -118,7 +118,7 @@
         "d": "Incorrect. Orthogonality affects ISI but not spectral leakage."
       },
       "correctAnswer": "c",
-      "difficulty": "hard"
+      "difficulty": "intermediate"
     },
     {
       "question": "8. In terms of power spectral density (PSD), which statement best describes GMSK?",
@@ -135,7 +135,7 @@
         "d": "Incorrect. GMSK avoids phase discontinuities, avoiding impulse-like spectral content."
       },
       "correctAnswer": "c",
-      "difficulty": "hard"
+      "difficulty": "intermediate"
     },
     {
       "question": "9. What is the role of coherent demodulation in improving BER performance for GMSK signals?",
@@ -152,7 +152,7 @@
         "d": "Incorrect. Coherent detection doesn’t filter noise; it uses phase tracking."
       },
       "correctAnswer": "c",
-      "difficulty": "hard"
+      "difficulty": "advanced"
     },
     {
       "question": "10. Why is GMSK preferred in GSM systems over QPSK or MSK?",
@@ -169,7 +169,7 @@
         "d": "Incorrect. GMSK requires phase detection, not envelope detection."
       },
       "correctAnswer": "b",
-      "difficulty": "hard"
+      "difficulty": "advanced"
     }
   ]
 }
