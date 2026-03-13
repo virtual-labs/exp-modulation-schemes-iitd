@@ -208,69 +208,55 @@
 		<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp frequency deviations to retrieve the transmitted data, and the decision circuit interprets these deviations, converting them into binary data (0s and 1s) based on set thresholds.</li>
     </ul>
 </div>
-    <div class="flex min-h-[80vh]">
-      <div class="px-6 pb-6 flex-1">
-        <!--  -->
-        <div class="flex">
-          <div class="flex-1 basis-4/5 flex flex-col">
-            <div class="flex max-lg:flex-col mt-5 items-center gap-x-8 gap-y-2">
+<div class="flex">
+  <div class="px-6 pb-6 flex-1">
+  </div>
 
+  <div class="flex-1 flex items-end gap-2 py-2 flex-col basis-1/5">
+    <a href="../bervssnr/GMSK_BerVsSnr.html"
+       class="bg-blue-500 text-white rounded-md px-4 py-1 inline-block">
+       Plot BER vs. SNR
+    </a>
+  </div>
+</div>
 
-            </div>
-            <div class="flex max-lg:flex-col mt-5 items-center gap-x-8 gap-y-2">
- 
+<div class="mt-4 border-t-2">
+  <div class="flex gap-2">
 
-            </div>
-          </div>
+    <div class="w-[50%] flex flex-col items-center">
+      <div class="relative my-4 w-[659px] h-[233px]">
 
+        <div class="absolute top-[200px] right-[88px]">
+          <button class="bg-blue-500 text-white rounded-md px-2 py-1"
+            onclick="plotDemodulatedSignal()">
+            Demodulate GMSK
+          </button>
         </div>
-        <div class="mt-4 border-t-2">
-          <div class="flex flex-col">
-            <!-- Buttons with gap -->
-            <div class="flex justify-center pt-4 gap-2">
-              <button
-                onclick="GMSKInput();"
-                class="bg-blue-500 text-white rounded-md px-3 py-1"
-              >
-                GMSK Input
-              </button>
-              <button
-                onclick="plotDemodulatedSignal()"
-                class="bg-blue-500 text-white rounded-md px-2 py-1"
-              >
-                Demodulate GMSK
-              </button>
-              <a href="../bervssnr/GMSK_BerVsSnr.html" target = "_blank">
-                <button
-                class="bg-green-500 text-white rounded-md px-3 py-1"
-                class="button"
-              >
-                Plot BER vs. SNR
-              </button>
-              </a>
-            </div>
-        
-            <div class="flex gap-1">
-              <div class="flex-1 flex flex-col items-center">
-                <div class="w-full">
-                  <img
-                    class="w-[80%] h-[80%]"
-                    src="gmsk_demod.png"
-                    alt="gmsk demodulation"
-                  />
-                </div>
-              </div>
-              <div id="scrolltodemodulated" class="flex flex-col items-center gap-2 justify-center max-lg:flex-col">
-                <div id="GMSKInput" class="w-[600px] h-[450px]"></div>
-                <div id="demodulated-signal" class="w-[600px] h-[450px]"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!--  -->
+
+        <button
+          onclick="GMSKInput();"
+          class="bg-blue-500 text-white py-1 px-3 mt-1 rounded-md hover:bg-[#0c9c0c] hover:scale-105">
+          GMSK Input
+        </button>
+
+        <img src="gmsk_demod.png" alt="gmsk demodulation"
+             class="w-full h-full" />
+
       </div>
     </div>
+
+
+      <div id="scrolltodemodulated"
+           class="flex flex-col items-center gap-2 justify-center max-lg:flex-col">
+
+        <div id="GMSKInput" class="w-[600px] h-[450px]"></div>
+        <div id="demodulated-signal" class="w-[600px] h-[450px]"></div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
 			<script>	
 		        function checkFrequencies() {
             // Get values from input fields
