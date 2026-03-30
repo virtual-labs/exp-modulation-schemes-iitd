@@ -2,7 +2,7 @@
   "version": 2.0,
   "questions": [
     {
-      "question": "1. How does the Gaussian filter bandwidth-time product (BT) in GMSK affect the system’s trade-off between spectral efficiency and inter-symbol interference (ISI)?",
+      "question": "How does the Gaussian filter bandwidth-time product (BT) in GMSK affect the system’s trade-off between spectral efficiency and inter-symbol interference (ISI)?",
       "answers": {
         "a": "A higher BT value increases ISI but improves bandwidth efficiency",
         "b": "A lower BT value reduces bandwidth but increases ISI",
@@ -19,7 +19,7 @@
       "difficulty": "intermediate"
     },
     {
-      "question": "2. In GMSK, how does the presence of memory due to Gaussian filtering affect maximum likelihood sequence estimation (MLSE)?",
+      "question": "In GMSK, how does the presence of memory due to Gaussian filtering affect maximum likelihood sequence estimation (MLSE)?",
       "answers": {
         "a": "It simplifies MLSE by reducing symbol dependencies",
         "b": "It makes MLSE unnecessary since phase transitions are smooth",
@@ -36,7 +36,7 @@
       "difficulty": "intermediate"
     },
     {
-      "question": "3. Why is MSK considered a special case of continuous phase frequency shift keying (CPFSK)?",
+      "question": "Why is MSK considered a special case of continuous phase frequency shift keying (CPFSK)?",
       "answers": {
         "a": "Because it uses rectangular pulse shaping for frequency changes",
         "b": "Because its modulation index is exactly 0.5 leading to phase continuity",
@@ -53,7 +53,7 @@
       "difficulty": "intermediate"
     },
     {
-      "question": "4. In the context of GMSK, which factor most directly determines the extent of inter-symbol interference (ISI)?",
+      "question": "In the context of GMSK, which factor most directly determines the extent of inter-symbol interference (ISI)?",
       "answers": {
         "a": "Phase offset of the carrier",
         "b": "Shape and duration of the Gaussian filter",
@@ -70,7 +70,7 @@
       "difficulty": "intermediate"
     },
     {
-      "question": "5. How does the minimum frequency spacing in MSK ensure orthogonality between symbols?",
+      "question": "How does the minimum frequency spacing in MSK ensure orthogonality between symbols?",
       "answers": {
         "a": "By keeping symbol energy below a defined threshold",
         "b": "By ensuring the integral of cross-product between basis functions is zero",
@@ -87,7 +87,7 @@
       "difficulty": "intermediate"
     },
     {
-      "question": "6. Why is non-coherent detection more challenging in GMSK compared to MSK?",
+      "question": "Why is non-coherent detection more challenging in GMSK compared to MSK?",
       "answers": {
         "a": "Because GMSK has higher peak-to-average power ratio",
         "b": "Because GMSK introduces memory through pulse shaping",
@@ -104,7 +104,7 @@
       "difficulty": "intermediate"
     },
     {
-      "question": "7. How does continuous phase modulation in MSK help in reducing spectral side lobes?",
+      "question": "How does continuous phase modulation in MSK help in reducing spectral side lobes?",
       "answers": {
         "a": "By eliminating the need for guard intervals",
         "b": "By spreading the signal energy evenly across the spectrum",
@@ -121,7 +121,7 @@
       "difficulty": "intermediate"
     },
     {
-      "question": "8. In terms of power spectral density (PSD), which statement best describes GMSK?",
+      "question": "In terms of power spectral density (PSD), which statement best describes GMSK?",
       "answers": {
         "a": "It exhibits nulls at integer multiples of the symbol rate",
         "b": "Its PSD is sharply bounded due to abrupt phase changes",
@@ -138,7 +138,7 @@
       "difficulty": "intermediate"
     },
     {
-      "question": "9. What is the role of coherent demodulation in improving BER performance for GMSK signals?",
+      "question": "What is the role of coherent demodulation in improving BER performance for GMSK signals?",
       "answers": {
         "a": "It suppresses adjacent channel interference",
         "b": "It enables maximum phase deviation for better noise immunity",
@@ -155,20 +155,20 @@
       "difficulty": "advanced"
     },
     {
-      "question": "10. Why is GMSK preferred in GSM systems over QPSK or MSK?",
+      "question": "Why is GMSK particularly suitable for mobile communication systems like GSM despite its inter-symbol interference?",
       "answers": {
-        "a": "Because it has a lower implementation cost",
-        "b": "Because it avoids amplitude fluctuations and has spectral compactness",
-        "c": "Because it requires fewer synchronization bits",
-        "d": "Because it can be demodulated using envelope detection"
+        "a": "Because its constant envelope allows highly efficient nonlinear power amplifiers",
+        "b": "Because it completely eliminates inter-symbol interference",
+        "c": "Because it uses multi-level amplitude modulation for higher data rates",
+        "d": "Because it simplifies carrier frequency synchronization"
       },
       "explanations": {
-        "a": "Incorrect. GMSK implementation is not necessarily cheaper.",
-        "b": "Correct! GMSK has constant envelope and narrow bandwidth, ideal for GSM.",
-        "c": "Incorrect. Synchronization requirements are independent of modulation type.",
-        "d": "Incorrect. GMSK requires phase detection, not envelope detection."
+        "a": "Correct! The constant envelope of GMSK enables the use of nonlinear, highly efficient RF amplifiers, which is crucial in mobile handsets.",
+        "b": "Incorrect. GMSK still has some ISI due to Gaussian filtering; it is tolerated for spectral efficiency.",
+        "c": "Incorrect. GMSK uses constant amplitude, not multi-level amplitude modulation.",
+        "d": "Incorrect. While phase continuity helps, synchronization is not the main reason for its suitability."
       },
-      "correctAnswer": "b",
+      "correctAnswer": "a",
       "difficulty": "advanced"
     }
   ]
