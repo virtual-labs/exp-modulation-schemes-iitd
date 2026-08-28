@@ -1,1 +1,1 @@
-## Study of Modulation schemes with Memory, like MSK, GMSK
+## Study of Modulation schemes with Memory - MSK / GMSK
