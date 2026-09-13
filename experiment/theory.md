@@ -5,6 +5,15 @@
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
+        <h2>Continuous Phase Frequency Shift Keying (CPFSK)</h2>
+        <p>Before looking at MSK and GMSK specifically, it helps to start with the broader family they belong to: <strong>Continuous Phase Frequency Shift Keying (CPFSK)</strong>. In conventional FSK, switching between frequencies can cause abrupt phase discontinuities at symbol boundaries, which widens the signal's spectrum and increases out-of-band interference. CPFSK avoids this by keeping the carrier's phase continuous across symbol transitions -- only the instantaneous frequency changes, never the phase itself.</p>
+        <p>A general CPFSK signal can be written as:</p>
+        <div class="equation">
+            $$s(t) = \cos\left(2\pi f_c t + 2\pi h \int_0^t b(\tau)\, d\tau\right)$$
+        </div>
+        <p>where \( b(t) \) is the data sequence (typically \( \pm 1 \)), \( f_c \) is the carrier frequency, and \( h \) is the <strong>modulation index</strong>, which controls how much the frequency shifts per bit. The phase (the integral term) evolves continuously over time rather than jumping, which is what gives the whole family its name.</p>
+        <p>MSK, covered below, is the special case of CPFSK with modulation index \( h = 0.5 \) -- the smallest index that keeps adjacent frequency-shifted signals orthogonal, which is where MSK gets its name ("minimum" shift keying). GMSK then applies a Gaussian pulse-shaping filter on top of MSK to further smooth the frequency transitions and reduce spectral occupancy.</p>
+
         <h2>Minimum Shift Keying (MSK)</h2>
         <p>In digital modulation, <strong>minimum-shift keying (MSK)</strong> is a type of continuous-phase frequency-shift keying. Similar to OQPSK, MSK is encoded with bits alternating between quadrature components, with the Q component delayed by half the symbol period.</p>
         <p>However, instead of square pulses as OQPSK uses, MSK encodes each bit as a half sinusoid. This results in a constant-modulus signal, which reduces problems caused by non-linear distortion. In addition to being viewed as related to OQPSK, MSK can also be viewed as a continuous phase frequency shift keyed (CPFSK) signal with a frequency separation of one half the bit rate. This specific frequency separation ensures that the phase shift over a bit period is exactly ±π/2.</p>
