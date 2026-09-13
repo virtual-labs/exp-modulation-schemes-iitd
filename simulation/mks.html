@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Virtual Labs</title>
+    <style>
+	    .container {
+            display: flex;
+			    height: 100vh; /* Full viewport height */
+        width: 100vw; /* Full viewport width */
+        }
+		.left-half {
+            width: 50vw;
+			}
+
+        .right-half {
+            width: 50vw;
+		    position: relative;
+		    overflow: auto;
+        }
+      table {
+        width: 80%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- sidebar and body -->
+	    <!-- sidebar and body -->
+	<div id = "instructions">
+    <h1>Instructions for Minimum Shift Keying Modulation (MSK)</h1>
+    <ul>
+      <li class="step step4"><strong>Note:</strong> Use the input fields to enter the number of bits, carrier frequency (Hz), and the baud rate (Hz)</li>
+
+        <li class="step step1"><strong>Step 1:</strong> Click on 'Generate Message' button to generate input message signal</li>
+		<li class="step step2"><strong>Step 2:</strong> Then click on 'Generate NRZ Signal' button to generate NRZ signal</li>
+        <li class="step step3"><strong>Step 3:</strong> Click on 'Generate Carrier' button to generate carrier signal</li>
+        <li class="step step1"><strong>Step 4:</strong> Click on 'Evaluate Baseband Phase' to view the baseband phase for MSK</li>
+        
+        <li class="step step1"><strong>Step 5:</strong> Click on 'Generate MSK Signal' button to generate Minimum Shift Keying Signal</li>
+        <li class="step step1"><strong>Step 6:</strong> Click on 'Show Frequency Spectrum' button to view the spectrum of MSK</li>
+
+        <li class="step step2">In MSK, the frequency shift is half the baud rate. MSK represents the "1" bit with a frequency slightly higher 
+		than the carrier, fc + (baud rate)/4 and the "0" bit with a frequency slightly lower 
+		than the carrier, fc - (baud rate)/4.
+    </li>
+    </ul>
+	</div>
+	<hr/>
+	<br>
+    <div class="flex min-h-[10vh]">
+      <div class="px-6 pb-6 mt-1 flex-1">
+        <div class="">
+          <div class="flex flex-col justify-center">
+            <div class="flex max-lg:flex-col gap-x-12 gap-y-2 mt-2">
+              <div class="">
+                <div class="flex items-center justify-center gap-1">
+                  <label for="bitstreamInput">Number of Bits:</label>
+                  <input
+                    class="max-lg:ml-10 border border-black px-2 py-1 rounded-sm"
+                    type="number"
+                    id="bitstreamInput"  
+                    value="4"
+                  />
+                </div>
+              </div>
+              <div class="flex items-center justify-center gap-1 mt-2">
+                <label for="carrierFrequencyInput">Carrier Frequency (Hz):</label>
+                <input
+                  class="border border-black px-2 py-1 rounded-sm"
+                  type="number"
+                  id="carrierFrequencyInput"
+                  value="5"
+                />
+              </div>
+              <div class="flex items-center justify-center gap-1 mt-2">
+                <label for="baudRateInput">Baud Rate (Hz):</label>
+                <input
+                  class="border border-black px-2 py-1 rounded-sm"
+                  type="number"
+                  id="baudRateInput"
+                  value="4"
+                />
+              </div>
+              <div class="flex items-center justify-center gap-1 mt-2">
+              <button 
+              class="bg-green-500 text-white rounded-md px-3 py-1 hover:scale-105"
+              onclick="location.reload();"
+            >
+              Reset Simulator
+            </button>
+            </div>
+
+              </div>
+            </div>
+            </div>
+        </div>
+      </div>
+    </div>
+	<hr/>
+	
+	<div class = "container">
+	<div class = "left-half">
+	          <div class="flex gap-1">
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full">
+				<br/><br/><br/><br/>
+                  <img
+                    src="msk_mod.png"
+                    alt="psk1" 
+					style= "height:250px; width: 550px; margin-left: 40px"
+                  />
+				<button
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[750px] left-[2px]"
+                  onclick="updateBitstream()"
+                >
+                  Generate Message
+                </button>
+				<button
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[785px] left-[2px]"
+                  onclick="plotNRZGraphs(result)"
+                >
+                  Generate NRZ<br/>Signal
+                </button>
+								<button
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 absolute top-[960px] left-[2px]"
+                  onclick="generateCarrierSignal()"
+                >
+                  Generate Carrier
+                </button>
+				
+                <button
+                class="button bg-blue-500 text-white rounded-md px-2 py-1 relative bottom-[100px] left-[400px]"
+                onclick="basebandPhase(bitstreamArray, fc, baudRate, Fs)"
+              >
+              Evaluate Baseband Phase
+              </button>
+			    <button
+                  class="button bg-blue-500 text-white rounded-md px-2 py-1 relative bottom-[50px] left-[200px]"
+                  onclick="plotModulated()"
+                >
+                  Generate MSK Signal
+                </button>
+
+                <button
+                class="button bg-gray-500 text-white rounded-md px-2 py-1 relative bottom-[-30px] left-[-200px]"
+                onclick="spectrum()"
+              >
+                Show Frequency Spectrum
+              </button>
+
+              
+	<!--		
+					                <button
+                  class="button bg-gray-500 text-white rounded-md px-2 py-1 relative top-[100px] right-[0px]"
+                  onclick="plotDemodulated()"
+                >
+                Perform Demodulation
+                </button>
+	-->				
+              </div>
+              </div>
+			  </div>
+
+	</div>
+
+
+				
+	<div class = "right-half">
+	            <div id = "scrolltomessage" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="digitalPlot" class="w-[600px] h-[450px]"></div>
+			</div>
+		    <div id = "scrolltonrz" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="nrzPlot" class="w-[600px] h-[450px]"></div>
+			</div>
+			<div id = "scrolltocarrier" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="carrier-plot" class="w-[600px] h-[450px]"></div>
+			</div>
+      <div id = "scrolltophaseplot" class="flex items-center gap-2 justify-center max-lg:flex-col">
+        <div id="phasePlot" class="w-[600px] h-[450px]"></div>
+      </div>
+			<div id = "scrolltomodulated" class="flex items-center gap-2 justify-center max-lg:flex-col">
+                <div id="mskModulatedPlot" class="w-[600px] h-[450px]"></div>
+              </div>
+              <div id = "scrolltospectrum" class="flex items-center gap-2 justify-center max-lg:flex-col">
+                <div id="spectrum" class="w-[600px] h-[450px]"></div>
+              </div>
+	</div>
+	</div>
+</div>
+	
+	
+	
+<div id = "demodulation">
+	    <!-- sidebar and body -->
+			  <div id = "container">
+    <h1>Instructions for Minimum Shift Keying (MSK) Demodulation</h1>
+    <ul>
+		<li class="step step1">Step 1: You can Demodulate the MSK Signal clicking on the 'Demodulate MSK' button</li>
+		<li class="step step2">The IF filter isolates the desired MSK signal from noise and interference. The delay circuit provides a delayed reference to detect phase transitions between successive bits. 
+		<br/>&nbsp&nbsp&nbsp&nbspThe phase shifter adjusts the signal's phase to align it with the local reference, enabling accurate demodulation of the bitstream.</li>
+    </ul>
+</div>
+    <div class="flex min-h-[80vh]">
+      <div class="px-6 pb-6 flex-1">
+        <!--  -->
+        <div class="flex">
+          <div class="flex-1 basis-4/5 flex flex-col">
+            <div class="flex max-lg:flex-col mt-5 items-center gap-x-8 gap-y-2">
+
+
+            </div>
+            <div class="flex max-lg:flex-col mt-5 items-center gap-x-8 gap-y-2">
+ 
+
+            </div>
+          </div>
+
+        </div>
+        <div class="mt-4 border-t-2">
+          <div class="flex flex-col">
+            <div class="flex justify-center pt-4">
+              <button
+                class="bg-blue-500 text-white rounded-md px-2 py-1"
+                class="button"
+                onclick="plotDemodulated()"
+              >
+                Demodulate MSK
+              </button>
+            </div>
+            <div class="flex gap-1">
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full">
+                  <img
+                    class="w-[80%] h-[80%]"
+                    src="msk_demod.png"
+                    alt="psk1"
+                  />
+                </div>
+              </div>
+              <div id = "scrolltodemodulated" class="flex items-center gap-2 justify-center max-lg:flex-col">
+              <div id="demodulatedPlot" class="w-[600px] h-[450px]"></div>
+            </div>
+            </div>
+          </div>
+        </div>
+        <!--  -->
+      </div>
+    </div>
+
+  </div>
+
+  <div align = "center">
+    <a href = ".\mks_demod.html">
+    <button
+    class="bg-blue-500 text-white py-1 px-3  rounded-md hover:scale-105"
+  >
+    Perform MSK Demodulation
+  </button>
+  </a>
+  </div>
+			<script>	
+		        function checkFrequencies() {
+            // Get values from input fields
+            let carrierFrequency = parseFloat(document.getElementById('carrierFrequencyInput').value);
+            let bit_rate = parseFloat(document.getElementById('baudRateInput').value);
+            console.log(carrierFrequency);
+			console.log(bit_rate);
+            // Check the frequencies
+            if (carrierFrequency <= bit_rate) {
+                alert("Carrier frequency should be much higher than Baud Rate.");
+		window.location.reload(true);     
+            } else {
+                console.log("Carrier frequency should be much higher than Baud Rate.");
+            }
+        }
+
+        // Function to attach event listeners to all buttons
+        function attachEventListeners() {
+            let buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', checkFrequencies);
+            });
+        }
+		
+		        // Attach event listeners when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', attachEventListeners);
+		</script>
+		
+    <script>
+
+	let baudRateformessage = 1;
+	let result = [];
+	let num_bits = 10;
+
+		
+function modulateMSK(bitstream, fc, baud, Fs) {
+    const T = 1 / baud;                  // Symbol duration
+    const N = bitstream.length;
+    const samplesPerSymbol = Math.floor(Fs * T);
+    const totalSamples = N * samplesPerSymbol;
+    const dt = 1 / Fs;
+
+    // Time vector
+    let t = Array.from({ length: totalSamples }, (_, i) => i * dt);
+
+    // Map bits {0,1} to {-1,+1}
+    let Dk = bitstream.map(b => 2 * b - 1);
+
+    // Compute phase trajectory to ensure continuity
+    let phase = new Array(totalSamples).fill(0);
+    let currentPhase = 0;
+
+    for (let k = 0; k < N; k++) {
+        const bit = Dk[k];
+        const freqShift = bit / (4 * T);  // ±1/(4T) shift
+        const omega = 2 * Math.PI * (fc + freqShift);
+
+        for (let n = 0; n < samplesPerSymbol; n++) {
+            const i = k * samplesPerSymbol + n;
+            const time = n * dt;
+            phase[i] = currentPhase + omega * time;
+        }
+
+        // Update current phase for the next symbol (continuous)
+        currentPhase = phase[(k + 1) * samplesPerSymbol - 1];
+    }
+
+    // Generate modulated MSK signal: s(t) = cos(phase)
+    let s = phase.map(phi => Math.cos(phi));
+
+    return [s, t];
+}
+
+
+
+
+        function demodMSK(s, fc, baud, Fs) {
+            let T = 1 / baud;
+            let samplesPerSymbol = T * Fs;
+            let N = s.length;
+            let s1 = modulateMSK([1], fc, baud, Fs)[0]; // Waveform of an MSK modulated 1 bit
+            let s0 = modulateMSK([0], fc, baud, Fs)[0]; // Waveform of an MSK modulated 0 bit
+            let bitstream = [];
+            for (let n = 0; n < N; n += samplesPerSymbol) {
+                if (n + samplesPerSymbol > N) {
+                    break;
+                }
+                let bit = 0;
+                let corr1 = xcorr(s.slice(n, n + samplesPerSymbol), s1); // correlate s1
+                let max1 = Math.max(...corr1);
+                let min1 = Math.min(...corr1);
+                let corr0 = xcorr(s.slice(n, n + samplesPerSymbol), s0); // correlate s0
+                let max0 = Math.max(...corr0);
+                let min0 = Math.min(...corr0);
+                if ((max1 + Math.abs(min1)) > (max0 + Math.abs(min0))) {
+                    bit = 1;
+                }
+                bitstream.push(bit);
+            }
+            return bitstream;
+        }
+
+        // Cross-correlation function (just for demonstration)
+        function xcorr(x, y) {
+            let result = [];
+            for (let delay = -x.length + 1; delay < y.length; delay++) {
+                let sum = 0;
+                for (let i = 0; i < x.length; i++) {
+                    if (i + delay >= 0 && i + delay < y.length) {
+                        sum += x[i] * y[i + delay];
+                    }
+                }
+                result.push(sum);
+            }
+            return result;
+        }
+
+        let bitstreamArray, baudRate;
+        // Function to update bitstream and plot graphs
+        function updateBitstream() {
+            num_bits = document.getElementById("bitstreamInput").value;
+            //let bitstreamArray = bitstreamInput.split(",").map(Number); // Convert comma-separated string to array of numbers
+            // Generate random bits
+            bitstreamArray = Array.from({ length: num_bits }, () => Math.round(Math.random()));
+            // Retrieve user inputs for carrier frequency and baud rate
+            let carrierFrequency = parseFloat(document.getElementById("carrierFrequencyInput").value);
+            baudRate = parseFloat(document.getElementById("baudRateInput").value);
+
+            
+            // Update bitstream and replot
+            result = modulateAndDemodulate(bitstreamArray, carrierFrequency, baudRate, 10000);
+            plotGraphs(result);
+        }
+
+        // Function to modulate and demodulate MSK
+        function modulateAndDemodulate(bitstream, fc, baud, Fs) {
+            // Modulate MSK
+            let modulatedResult = modulateMSK(bitstream, fc, baud, Fs);
+            let y = modulatedResult[0];
+            let t = modulatedResult[1];
+
+            // Demodulate MSK
+            let demodulatedBitstream = demodMSK(y, fc, baud, Fs);
+
+            return { bitstream: bitstream, modulatedSignal: y, demodulatedBitstream: demodulatedBitstream, time: t };
+        }
+
+        // Function to plot graphs
+        let digitalTrace, digitalLayout;
+ function plotGraphs(result) {
+    // Get the baud rate and compute scaling factor for time
+    baudRateformessage = parseFloat(document.getElementById("baudRateInput").value);
+    let k = 10000 / baudRateformessage; // Replace with your desired constant
+
+    // Multiply each x value by the constant
+    let scaledTime = result.time.map(t => t * k);
+
+    // Represent the digital signal from the bitstream
+    const digitalSignal = representDigitalSignal(result.bitstream);
+
+    const annotations = bitstreamArray.slice(0, num_bits).map((bit, index) => ({
+        x: (index + 0.5) * (1 / baudRateformessage), // Midpoint of each bit duration, adjust with (1 / baudRate)
+        y: 1.1, // Position slightly above the signal (adjust based on bit value)
+        text: bit.toString(), // Display the bit value (0 or 1)
+        showarrow: false, // No arrow pointing to the annotation
+        font: { color: "black", size: 14 } // Font style for the annotation
+    }));
+
+    digitalTrace = {
+        x: digitalSignal.tx,  // Digital time values
+        y: digitalSignal.bitx.flat(),  // Flatten the array of binary bits
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Message Signal',
+        line: {
+            shape: 'hv' // Step-like horizontal-vertical (HV) lines for digital signals
+        }
+    };
+
+    digitalLayout = {
+        title: 'Original Message Signal',
+        xaxis: {
+            title: 'Time (s)'
+        },
+        yaxis: {
+            title: 'Bit Value',
+            range: [-0.1, 1.1] // Limit y-axis range to fit binary values
+        },
+        annotations: annotations
+    };
+
+    let digitalData = [digitalTrace];
+
+    // Plot the digital signal using Plotly
+    Plotly.newPlot('digitalPlot', digitalData, digitalLayout);
+    document.getElementById('scrolltomessage').scrollIntoView({ behavior: 'smooth' });
+
+}
+
+function representDigitalSignal(bitsx) {
+    const bitx = [];
+    const Fs = 10000;
+    const bps = parseInt(document.getElementById("baudRateInput").value);
+    const bp = 1 / bps; // Bit period
+
+    // Represent each bit as a sequence of 0s or 1s
+    for (let n = 0; n < bitsx.length; n++) {
+        bitx.push(Array(Fs).fill(bitsx[n]));
+    }
+
+    // Flatten time and bit arrays
+    const tx = [];
+    for (let i = 1; i <= Fs * bitsx.length; i++) {
+        tx.push((i * bp) / Fs);
+    }
+
+    return { bitx, tx };
+}
+
+			
+		function plotModulated() {
+            // Plot modulated MSK signal
+            let mskModulatedTrace = {
+                x: result.time,
+                y: result.modulatedSignal,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'MSK Modulated Signal'
+            };
+
+            let mskModulatedLayout = {
+                title: 'MSK Modulated Signal',
+                xaxis: {
+                    title: 'Time (s)'
+					//range: [-0.1, auto] 
+                },
+                yaxis: {
+                    title: 'Amplitude'
+                }
+            };
+
+            let mskModulatedData = [mskModulatedTrace];
+            Plotly.newPlot('mskModulatedPlot', mskModulatedData, mskModulatedLayout);
+		    document.getElementById('scrolltomodulated').scrollIntoView({ behavior: 'smooth' });
+
+        
+        saveData(); 
+            }
+			
+function plotDemodulated() {
+    // Get the baud rate and compute scaling factor for time
+    let k1 = 10000 / baudRateformessage; // Replace with your desired constant
+
+    // Multiply each x value by the constant and truncate time to match the length of demodulated bitstream
+    let scaledTime1 = result.time.slice(0, result.demodulatedBitstream.length).map(t => t * k1);
+
+    // Represent the digital signal from the demodulated bitstream
+    const digitalDemodulatedSignal = representDigitalSignal(result.demodulatedBitstream);
+
+    let digitalDemodulatedTrace = {
+        x: digitalDemodulatedSignal.tx,  // Digital time values for demodulated signal
+        y: digitalDemodulatedSignal.bitx.flat(),  // Flatten the array of binary bits
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Demodulated Digital Signal',
+        line: {
+            shape: 'hv' // Step-like horizontal-vertical (HV) lines for digital signals
+        }
+    };
+
+    let digitalDemodulatedLayout = {
+        title: 'Demodulated Signal',
+        xaxis: {
+            title: 'Time (s)'
+        },
+        yaxis: {
+            title: 'Bit Value',
+            range: [-0.1, 1.1] // Limit y-axis range to fit binary values
+        }
+    };
+
+    let digitalDemodulatedData = [digitalDemodulatedTrace];
+
+    // Plot the demodulated digital signal using Plotly
+    Plotly.newPlot('demodulatedPlot', digitalDemodulatedData, digitalDemodulatedLayout);
+    document.getElementById('scrolltodemodulated').scrollIntoView({ behavior: 'smooth' });
+
+}
+
+		function generateCarrierSignal() {
+            Fs = 1000;
+            fc = parseInt(document.getElementById("carrierFrequencyInput").value);;
+            const t = Array.from({ length: 1 * Fs }, (_, i) => i / Fs);
+            const carrier_signal = t.map((time) => Math.sin(2 * Math.PI * fc * time));
+
+            const carrierData = [{
+                x: t,
+                y: carrier_signal,
+                type: "scatter",
+                mode: "lines",
+                name: "Carrier Signal",
+            }];
+
+            const carrierLayout = {
+                title: "Carrier Signal",
+                xaxis: { title: "Time (s)" },
+                yaxis: { title: "Amplitude" },
+            };
+
+            Plotly.newPlot("carrier-plot", carrierData, carrierLayout);
+						// Scroll to the plot area
+
+			//document.getElementById('scrolltocarrier').style.display = 'block';
+			            document.getElementById('scrolltocarrier').scrollIntoView({ behavior: 'smooth' });
+        }
+		
+function plotNRZGraphs(result) {
+    // Get the baud rate and compute scaling factor for time
+    let baudRate = parseFloat(document.getElementById("baudRateInput").value);
+    let k = 10000 / baudRate;  // Scaling factor for time
+
+    // Represent the digital signal from the bitstream
+    const digitalSignal1 = representDigitalSignal(result.bitstream);
+
+    // Convert the bitstream into NRZ format
+    let nrzTrace = {
+        x: digitalSignal1.tx,  // Time values scaled
+        y: digitalSignal1.bitx.flat().map(b => b * 2 - 1),  // NRZ signal values: 1 -> +1, 0 -> -1
+        type: 'scatter',
+        mode: 'lines',
+        name: 'NRZ Signal',
+        line: {
+            shape: 'hv'  // Step-like lines for NRZ signal
+        }
+    };
+
+    // Layout for the NRZ plot
+    let nrzLayout = {
+        title: 'NRZ Signal',
+        xaxis: {
+            title: 'Time (s)'
+        },
+        yaxis: {
+            title: 'Voltage Level',
+            range: [-1.1, 1.1]  // Limit y-axis for NRZ (-1, 1)
+        }
+    };
+
+    // Data for NRZ plot
+    let nrzData = [nrzTrace];
+
+    // Plot the NRZ signal using Plotly
+    Plotly.newPlot('nrzPlot', nrzData, nrzLayout);
+				            document.getElementById('scrolltonrz').scrollIntoView({ behavior: 'smooth' });
+
+}
+
+function representDigitalSignal(bitsx) {
+    const bitSignal = [];
+    const Fs = 10000;  // Sampling frequency
+    const baudRate = parseInt(document.getElementById("baudRateInput").value);
+    const bitPeriod = 1 / baudRate;  // Bit period
+
+    // Represent each bit as a sequence of 0s or 1s (stretched over time)
+    bitsx.forEach(bit => {
+        bitSignal.push(Array(Fs).fill(bit));
+    });
+
+    // Flatten the bit array for easier plotting
+    const flattenedBitSignal = bitSignal.flat();
+
+    // Time axis for plotting
+    const time = [];
+    for (let i = 0; i < flattenedBitSignal.length; i++) {
+        time.push((i * bitPeriod) / Fs);
+    }
+
+    return { bitx: flattenedBitSignal, tx: time };
+}
+
+
+// safe sinc
+function sinc(x) {
+  if (Math.abs(x) < 1e-12) return 1.0;
+  return Math.sin(Math.PI * x) / (Math.PI * x);
+}
+
+function mskPSD_val(f, T) {
+  const x = f * T;
+  const s = sinc(x);
+  const c = Math.cos(Math.PI * x / 2.0);
+  return (s * s) * (c * c);
+}
+
+function gmskFactorSquared(f, T, BT) {
+  const arg = Math.PI * f * T * BT / Math.sqrt(Math.log(2));
+  return Math.exp(-(arg * arg));
+}
+
+function spectrum() {
+  let Rb = parseFloat(document.getElementById('baudRateInput').value) || 1000;
+  let carrierFrequency = parseFloat(document.getElementById('carrierFrequencyInput').value);
+  const BT = 0.3;
+  const fRangeNorm = 3;
+
+  const T = 1.0 / Rb;
+  const N = 4096;
+  const fMax = fRangeNorm * Rb;
+  const f = new Array(N);
+  for (let i = 0; i < N; i++) {
+    f[i] = -fMax + (2 * fMax) * i / (N - 1);
+  }
+
+  const Smsk = new Array(N);
+  const Sgmsk = new Array(N);
+  for (let i = 0; i < N; i++) {
+    const val_msk = mskPSD_val(f[i], T);
+    const gf2 = gmskFactorSquared(f[i], T, BT);
+    Smsk[i] = val_msk;
+    Sgmsk[i] = val_msk * gf2;
+  }
+
+  const eps = 1e-15;
+  const maxMsk = Math.max(...Smsk) + eps;
+  const maxGmsk = Math.max(...Sgmsk) + eps;
+  /*
+  const SmskDB = Smsk.map(v => 10 * Math.log10(Math.max(v / maxMsk, eps)));
+  const SgmskDB = Sgmsk.map(v => 10 * Math.log10(Math.max(v / maxGmsk, eps)));
+  */
+    const SmskDB = Smsk.map(v => 10 * Math.log10(Math.max(v / maxMsk, eps)) - 10*Math.log10(Rb));
+  const SgmskDB = Sgmsk.map(v => 10 * Math.log10(Math.max(v / maxGmsk, eps)) - 10*Math.log10(Rb));
+
+  // x-axis is now in Hz (no normalization)
+  const traceM = { x: f.map(value => value + carrierFrequency), y: SmskDB, name: 'MSK (theory)', mode:'lines', line:{width:2} };
+  //const traceG = { x: f, y: SgmskDB, name: `GMSK (BT=${BT}) (approx)`, mode:'lines', line:{width:2} };
+
+  const layout = {
+    title: `Spectrum of MSK`,
+    xaxis: { title: 'Frequency (Hz)', zeroline:false },
+    yaxis: { title: 'PSD (dB/Hz)', range: [ -120, -1 ] },
+    //legend: { x: 0.98, y: 0.90 }
+  };
+
+  Plotly.newPlot('spectrum', [traceM], layout, {responsive: true});
+  document.getElementById('scrolltospectrum').scrollIntoView({ behavior: 'smooth' });
+}
+
+let trace;
+
+function basebandPhase(bitstream, fc, baud, Fs) {
+    const T = 1 / baud;                  // Symbol duration
+    const N = bitstream.length;
+    const samplesPerSymbol = Math.floor(Fs * T);
+    const totalSamples = N * samplesPerSymbol;
+    const dt = 1 / Fs;
+
+    // Time vector
+    let t = Array.from({ length: totalSamples }, (_, i) => i * dt);
+
+    // Map bits {0,1} to {-1,+1}
+    let Dk = bitstream.map(b => 2 * b - 1);
+
+    // ✅ Compute smooth, continuous baseband phase
+    let phi = new Array(totalSamples).fill(0);
+    let currentPhase = 0;
+
+    for (let k = 0; k < N; k++) {
+        const bit = Dk[k];
+        const freqShift = bit / (4 * T); // ±1/(4T)
+        const omega = 2 * Math.PI * freqShift;
+
+        for (let n = 0; n < samplesPerSymbol; n++) {
+            const i = k * samplesPerSymbol + n;
+            const time = n * dt;
+            phi[i] = currentPhase + omega * time; // phase accumulates smoothly
+        }
+
+        // Update phase at the end of this symbol for continuity
+        currentPhase = phi[(k + 1) * samplesPerSymbol - 1];
+    }
+
+    // ✅ Plot baseband phase
+    trace = {
+        x: t,
+        y: phi,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Baseband Phase'
+    };
+
+    let layout = {
+        title: "MSK Baseband Phase Evolution",
+        xaxis: { title: "Time (s)" },
+        yaxis: { title: "Phase (rad)" }
+    };
+
+    digitalLayout = {
+        showlegend: true,
+    };
+
+    const combinedLayout = {
+        ...layout,
+        ...digitalLayout
+    };
+
+    Plotly.newPlot("phasePlot", [trace, digitalTrace], combinedLayout);
+
+    return [phi, t];
+}
+
+
+
+
+
+function saveData() {
+
+// Store as an object (use the variables you actually defined)
+const num_bits = document.getElementById("bitstreamInput").value;
+const carrierFrequency = parseFloat(document.getElementById("carrierFrequencyInput").value);
+const baudRate = parseFloat(document.getElementById("baudRateInput").value);
+const myData = { num_bits: num_bits, carrierFrequency: carrierFrequency, baudRate: baudRate, result: result };
+localStorage.setItem('sharedData', JSON.stringify(myData));
+}
+
+    </script>
+	
+	<style>
+    #demodulation {
+      display: none;
+    }
+#container {
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 25px 40px;
+  max-width: 100%;
+  margin: 20px auto;
+  text-align: left;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+h1 {
+  color: #1e3a8a;
+  font-size: 24px;
+  margin-bottom: 25px;
+  text-align: justify;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li.step {
+  margin: 12px 0;
+  padding: 12px 15px;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+li.step::before {
+  content: "✔";
+  color: #10b981;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+li.step:hover {
+  transform: scale(1.02);
+  background-color: #f3f4f6;
+}
+
+/* Color code each step */
+.step1 {
+  background-color: #ffe0e0;
+  border-left: 5px solid #ef4444;
+}
+.step2 {
+  background-color: #e0f7ff;
+  border-left: 5px solid #0ea5e9;
+}
+.step3 {
+  background-color: #e0ffe5;
+  border-left: 5px solid #22c55e;
+}
+.step4 {
+  background-color: #f5e0ff;
+  border-left: 5px solid #a855f7;
+}
+	</style>
+  </body>
+</html>

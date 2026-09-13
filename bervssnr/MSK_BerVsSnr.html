@@ -1,0 +1,216 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs/lib/browser/math.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Virtual Labs</title>
+    <style>
+      table {
+        width: 80%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        width: 100px;
+      }
+    </style>
+    <script>
+        // Function to calculate BER based on the EbN0 value
+        function calculateBER() {
+            const ebn0Input = document.getElementById('ebn0Input').value;
+            const ebn0 = parseFloat(ebn0Input);
+
+            if (isNaN(ebn0)) {
+                document.getElementById('result').innerText = 'Please enter a valid number';
+                return;
+            }
+
+            const existingValues = getTableValues();
+            if (existingValues.includes(ebn0)) {
+                alert('EbN0 value already exists in the table');
+                return;
+            }
+
+            // Calculate the theoretical BER for the given Eb/N0 value
+            const ber = 0.5 * (1 - erf(Math.sqrt(math.pow(10, ebn0 / 10))));
+
+            // Add the value to the table and sort the table
+            addToTable(ebn0, ber);
+            sortTable();
+        }
+
+        // Error function approximation (from math.js)
+        function erf(x) {
+            // Save the sign of x
+            const sign = (x >= 0) ? 1 : -1;
+            x = Math.abs(x);
+
+            // Constants
+            const a1 =  0.254829592;
+            const a2 = -0.284496736;
+            const a3 =  1.421413741;
+            const a4 = -1.453152027;
+            const a5 =  1.061405429;
+            const p  =  0.3275911;
+
+            // A&S formula 7.1.26
+            const t = 1.0 / (1.0 + p * x);
+            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+            return sign * y;
+        }
+
+        // Function to add the values to the table
+        function addToTable(ebn0, ber) {
+            const table = document.getElementById('berTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            const cell1 = newRow.insertCell(0);
+            const cell2 = newRow.insertCell(1);
+            cell1.textContent = ebn0;
+            cell2.textContent = ber;
+        }
+
+        // Function to sort the table based on the EbN0 values
+        function sortTable() {
+            const table = document.getElementById('berTable').getElementsByTagName('tbody')[0];
+            const rows = Array.from(table.rows);
+
+            rows.sort((a, b) => {
+                const ebn0A = parseFloat(a.cells[0].textContent);
+                const ebn0B = parseFloat(b.cells[0].textContent);
+                return ebn0A - ebn0B;
+            });
+
+            rows.forEach(row => table.appendChild(row));
+        }
+
+        // Function to get the EbN0 values from the table
+        function getTableValues() {
+            const table = document.getElementById('berTable').getElementsByTagName('tbody')[0];
+            const rows = table.getElementsByTagName('tr');
+            const values = [];
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                const ebn0 = parseFloat(cells[0].textContent);
+                values.push(ebn0);
+            }
+
+            return values;
+        }
+
+        // Function to plot the EbN0 vs BER graph from the table data
+        function plotBERGraphFromTable() {
+            const table = document.getElementById('berTable').getElementsByTagName('tbody')[0];
+            const rows = table.getElementsByTagName('tr');
+            const EbN0 = [];
+            const BER = [];
+            
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                const ebn0 = parseFloat(cells[0].textContent);
+                const ber = parseFloat(cells[1].textContent);
+                EbN0.push(ebn0);
+                BER.push(ber);
+            }
+
+            const trace = {
+                x: EbN0,
+                y: BER,
+                mode: 'lines+markers',
+                type: 'scatter',
+                line: { color: 'blue' },
+                marker: { symbol: 'square' },
+                name: 'theory - MSK'
+            };
+
+            const layout = {
+                title: 'Bit Error Probability Curve for MSK Modulation',
+                xaxis: {
+                    title: 'SNR (dB)',
+                    range: [Math.min(...EbN0), 10]  // Adjusted the range to include the minimum SNR value
+                },
+                yaxis: {
+                    title: 'Bit Error Rate',
+                    type: 'log',
+                    range: [-5, 0.5]
+                },
+                grid: {
+                    visible: true
+                }
+            };
+
+            Plotly.newPlot('plot', [trace], layout);
+        }
+    </script>
+  </head>
+  <body>
+    <!-- sidebar and body -->
+    <div class="flex min-h-[80vh]">
+      <div class="px-6 pb-6 mt-1 flex-1">
+        <div class="">
+          <div class="flex flex-col justify-center">
+            <div class="flex max-lg:flex-col gap-x-12 gap-y-2 mt-2">
+              <div class="">
+                <div class="flex items-center justify-center gap-1">
+                  <label for="ebn0Input">Enter SNR value (in dB):</label>
+                  <input
+                    class="max-lg:ml-10 border border-black px-2 py-1 rounded-sm"
+                    type="number"
+                    id="ebn0Input"  
+                    value="0"
+                  />
+                </div>
+              </div>
+              <div class="flex justify-center">
+                <button
+                  class="bg-blue-500 text-white rounded-md px-2 py-1"
+                  class="button"
+                  onclick="calculateBER()"
+                >
+                  Calculate BER
+                </button>
+              </div>
+              <div class="flex justify-center">
+                <button
+                  class="bg-blue-500 text-white rounded-md px-2 py-1"
+                  class="button"
+                  onclick="plotBERGraphFromTable()"
+                >
+                  Plot BER vs SNR
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="flex my-2 max-lg:flex-col">
+            <div class="flex-1 basis-2/5">
+              <h3 class="flex ml-3 text-[#42c7bc] text-[20px] font-medium">BER Results</h3>
+              <table class="mt-1" id="berTable">
+                <thead>
+                <tr class="bg-slate-300">
+                  <th>SNR (dB)</th>
+                  <th>BER</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+              </table>
+            </div>
+            <div class="flex-1 basis-3/5">
+              <div id="plot" width="600" height="400"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
